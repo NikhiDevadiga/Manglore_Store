@@ -1,0 +1,148 @@
+
+.footer {
+    background-color:  #02002ee0;
+    padding: 50px 2px;
+    border-top: 1px solid #f7f6f8;
+  }
+  
+  
+  .footer-sections {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1350px;
+    margin: 0 auto;
+  }
+  
+  
+  .footer-left {
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .footer-logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  
+  .footer-description {
+    font-size: 14px;
+    color: #9d66bd;
+    margin-bottom: 20px;
+  }
+  
+  .social-links {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .social-links a {
+    font-size: 22px;
+    color: #9d66bd;
+    transition: color 0.3s ease;
+  }
+  
+  .social-links a:hover {
+    color: rgba(254, 254, 254, 0.88);
+  }
+  
+  .footer-company {
+    font-size: 12px;
+    color: #9d66bd;
+  }
+  
+
+  .footer-center {
+    display: flex;
+    justify-content: space-around;
+    min-width: 250px;
+  }
+  
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .footer-links h4 {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 9px;
+    font-weight: bold;
+  }
+  
+  .footer-links a {
+    font-size: 14px;
+    color: #d3cece;
+    text-decoration: none;
+  }
+  
+  .footer-links a:hover {
+    color: #9d66bd;
+  }
+  
+  
+  .footer-right {
+    min-width: 250px;
+  }
+  
+  .footer-right h4 {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  
+  .footer-right p {
+    font-size: 14px;
+    color: #b0aeae;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .footer-icon {
+    margin-right: 8px;
+    color: rgba(142, 141, 143, 0.88);
+  }
+  
+  .footer-phone,
+  .footer-email {
+    color: #b8b8b8;
+    text-decoration: none;
+  }
+  
+  .footer-phone:hover,
+  .footer-email:hover {
+    text-decoration: underline;
+  }
+  
+ 
+  @media (max-width: 768px) {
+    .footer-sections {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2px 10px;
+    }
+    .footer-center {
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+  
+    .footer-links {
+      margin-bottom: 2px;
+    }
+  
+    .footer-right {
+      margin-top: 2px;
+    }
+
+    .social-links {
+      justify-content: center;
+      }
+  }

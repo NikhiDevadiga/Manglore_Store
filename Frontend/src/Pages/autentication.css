@@ -1,0 +1,36 @@
+.auth-parent{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(180deg, #e4814f 0%, #c6b3a7 100%);
+    position: absolute;
+    width: 100%;
+}
+.auth-parent form{
+    width: 400px;
+    box-shadow: 0 0 3px gray;
+    padding: 20px;
+    background-color: #ffffffe9;
+    z-index: 1;
+    padding: 60px 30px;
+}
+.auth-parent h1{
+    font-size: 22px;
+    font-weight: bold;
+}
+.brand{
+    font-size: 200px !important;
+    position: absolute;
+    text-align: center;
+    top: 30%;
+    left: 20%;
+    transform: rotate(-10deg) !important;
+    color: #000000a9;
+    transform: translate(-50%, -50%);
+}
+@media only screen and (max-width: 1000px) {
+    .brand{
+        display: none;
+    }
+}
