@@ -64,7 +64,7 @@ const WishlistPage = () => {
             >
               <CardMedia
                 component="img"
-                image={`http://localhost:5000/${product.image.replace(/\\/g, "/")}`}
+                image={`https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`}
                 alt={product.name}
                 sx={{
                   height: 120,
