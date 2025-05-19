@@ -31,7 +31,7 @@ const AdminLogin = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/adminlogin", form);
+      const res = await axios.post("https://manglore-store-t98r.onrender.com/api/adminlogin", form);
       localStorage.setItem("Manglore-user", JSON.stringify(res.data));
       alert("Login successful!");
       navigate("/Admin");
