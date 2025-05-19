@@ -61,7 +61,8 @@ app.use('/Backend/Images', express.static(path.join(__dirname, 'Images')));
 // Start the server
 app.listen(PORT, () => {
   connectDB();
-  console.log(Server started at http://localhost:${PORT});
+  console.log(`Server started at http://localhost:${PORT}`);
+
 });
 
 // Nodemailer transporter
