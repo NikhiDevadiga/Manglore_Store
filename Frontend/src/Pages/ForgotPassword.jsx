@@ -23,7 +23,7 @@ function ForgotPassword() {
     setMessage("");
 
     axios
-      .post("http://localhost:5000/api/forgotpassword", { email })  // Correct endpoint
+      .post("https://manglore-store-t98r.onrender.com/api/forgotpassword", { email })  // Correct endpoint
       .then((res) => {
         if (res.data.Status === "Success") {
           setMessage("Check your email for the password reset code.");
