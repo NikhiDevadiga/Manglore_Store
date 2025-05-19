@@ -29,7 +29,7 @@ function Login() {
     setErrors({ email: "", password: "" });
 
     try {
-      const res = await axios.post("http://localhost:5000/api/login", { email, password });
+      const res = await axios.post("https://manglore-store-t98r.onrender.com/api/login", { email, password });
 
       if (res.data.Status === "Success") {
       //  Save user data to localStorage
