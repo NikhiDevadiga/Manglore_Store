@@ -21,7 +21,7 @@ const ProfileDrawer = ({ open, onClose, user, userDetails, setUserDetails, editP
 
   const fetchUserDetails = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users/list");
+      const res = await axios.get("https://manglore-store-t98r.onrender.com/api/users/list");
       const matchedUser = res.data.data.find(u => u.email === user?.email);
       setUserDetails(matchedUser);
       setEditProfileData({ name: matchedUser.name, email: matchedUser.email, phone: matchedUser.phone });
