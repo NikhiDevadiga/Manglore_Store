@@ -12,7 +12,7 @@ const SavedAddresses = ({ user }) => {
     const fetchAddresses = async () => {
       setLoadingAddresses(true);
       try {
-        const res = await axios.get(`http://localhost:5000/api/address/${user._id}`);
+        const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/address/${user._id}`);
         setAddressList(res.data);
       } catch (err) {
         console.error("Failed to fetch addresses", err);
@@ -26,7 +26,7 @@ const SavedAddresses = ({ user }) => {
 
   const handleDeleteAddress = async (addressId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/address/${user._id}/${addressId}`);
+      await axios.delete(`https://manglore-store-t98r.onrender.com/api/address/${user._id}/${addressId}`);
       setAddressList(prev => prev.filter(addr => addr._id !== addressId));
     } catch (err) {
       console.error("Failed to delete address", err);
