@@ -18,7 +18,7 @@ const SubCategory = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/${categoryId}`)
+      .get(`https://manglore-store-t98r.onrender.com/api/${categoryId}`)
       .then((res) => setSubcategories(res.data.data))
       .catch((err) => console.error("Subcategory fetch error:", err));
   }, [categoryId]);
@@ -55,7 +55,7 @@ const SubCategory = () => {
             >
               <CardMedia
                 component="img"
-                image={`http://localhost:5000/${subcategory.image.replace(/\\/g, "/")}`}
+                image={`https://manglore-store-t98r.onrender.com/${subcategory.image.replace(/\\/g, "/")}`}
                 alt={subcategory.name}
                 sx={{
                   objectFit: "fill",
