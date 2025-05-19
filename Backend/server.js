@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 5000;
 
 // Allowed origins for CORS
 const allowedOrigins = [
-  "https://manglore-store.onrender.com", // production
+  "https://manglore-store-t98r.onrender.com", // production
   "http://localhost:5173"                // local dev
 ];
 
