@@ -70,7 +70,7 @@ function Register() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/registration", form);
+      const response = await axios.post("https://manglore-store-t98r.onrender.com/api/registration", form);
       localStorage.setItem("user", JSON.stringify({
         name: form.name,
         email: form.email,
