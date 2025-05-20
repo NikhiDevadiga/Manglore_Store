@@ -33,25 +33,23 @@ export default function CartDrawer({ open, onClose }) {
 
   const finalTotal = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-        const price = parseFloat(item?.price) || 0;
-        const quantity = parseInt(item?.quantity) || 0;
-        const gst = parseFloat(item?.gst) || 0;
-        const itemTotal = price * quantity;
-        const gstAmount = (itemTotal * gst) / 100;
-        return sum + itemTotal + gstAmount;
-      }, 0)
+      const price = parseFloat(item?.price) || 0;
+      const quantity = parseInt(item?.quantity) || 0;
+      const itemTotal = price * quantity;
+      return sum + itemTotal;
+    }, 0)
     : 0;
 
   // Calculate total GST amount
   const totalGST = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-        const price = parseFloat(item?.price) || 0;
-        const quantity = parseInt(item?.quantity) || 0;
-        const gst = parseFloat(item?.gst) || 0;
-        const itemTotal = price * quantity;
-        const gstAmount = (itemTotal * gst) / 100;
-        return sum + gstAmount;
-      }, 0)
+      const price = parseFloat(item?.price) || 0;
+      const quantity = parseInt(item?.quantity) || 0;
+      const gst = parseFloat(item?.gst) || 0;
+      const itemTotal = price * quantity;
+      const gstAmount = (itemTotal * gst) / 100;
+      return sum + gstAmount;
+    }, 0)
     : 0;
 
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -63,23 +61,23 @@ export default function CartDrawer({ open, onClose }) {
   const [dialogMessage, setDialogMessage] = useState('');
   const [addressesOpen, setAddressesOpen] = useState(false);
   const [fetchedAddress, setFetchedAddress] = useState("");
-  const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);  
+  const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user?._id) return;
-  
+
     const fetchAddresses = async () => {
       try {
-        const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/address/${user._id}`);
+        const res = await axios.get(`http://localhost:5000/api/address/${user._id}`);
         setSavedAddresses(res.data); // Adjust this if your API returns a nested structure
       } catch (err) {
         console.error("Failed to fetch saved addresses:", err.response ? err.response.data : err.message);
       }
     };
-  
+
     fetchAddresses();
-  
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
@@ -87,8 +85,8 @@ export default function CartDrawer({ open, onClose }) {
       );
     }
   }, []);
-  
-  
+
+
 
   const handleTogglePayment = () => setPaymentOpen(prev => !prev);
   const handleToggleAddresses = () => setAddressesOpen(prev => !prev);
@@ -143,8 +141,8 @@ export default function CartDrawer({ open, onClose }) {
     const user = JSON.parse(localStorage.getItem('user'));
     try {
       const response = await axios.post(
-        `https://manglore-store-t98r.onrender.com/api/address/${user._id}`,
-        address, 
+        `http://localhost:5000/api/address/${user._id}`,
+        address,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -169,7 +167,7 @@ export default function CartDrawer({ open, onClose }) {
     }
   };
 
-    const handleProceedPayment = async () => {
+  const handleProceedPayment = async () => {
     await handleDetectLocation();
 
     const user = JSON.parse(localStorage.getItem('user'));
@@ -200,10 +198,10 @@ export default function CartDrawer({ open, onClose }) {
         paymentId: extra.paymentId || "",
         userId: user?._id || null,
       };
-    
+
       try {
         console.log("Cart Items: ", cartItems);
-        const response = await axios.post('https://manglore-store-t98r.onrender.com/api/admin/createOrders', order);
+        const response = await axios.post('http://localhost:5000/api/admin/createOrders', order);
       } catch (err) {
         console.error("Error saving order:", err.response?.data || err.message);
         setDialogMessage("Failed to place order. Please try again.");
@@ -212,10 +210,10 @@ export default function CartDrawer({ open, onClose }) {
       }
       return true;
     };
-    
+
 
     if (paymentMode === 'Cash on Delivery') {
-      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal}`);
+      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal.toFixed(2)}`);
       setDialogOpen(true);
       await saveOrderToBackend();
       await saveAddressToBackend();
@@ -237,7 +235,7 @@ export default function CartDrawer({ open, onClose }) {
         image: 'https://your-logo-url.com/logo.png',
         handler: function (response) {
           saveOrderToBackend({ paymentId: response.razorpay_payment_id });
-          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal}`);
+          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal.toFixed(2)}`);
           setDialogOpen(true);
           saveAddressToBackend();
           clearCart();
@@ -258,196 +256,207 @@ export default function CartDrawer({ open, onClose }) {
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 360, p: 3, display: 'flex', flexDirection: 'column', height: '100%', color:"#ddd", backgroundColor:"#02002ee0" }}>
+      <Box sx={{ width: 360, p: 3, display: 'flex', flexDirection: 'column', height: '100%', color: "#ddd", backgroundColor: "#02002ee0" }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6">Your Cart</Typography>
-          <IconButton onClick={onClose} sx={{color:"#9c44ce"}}><CloseIcon /></IconButton>
+          <IconButton onClick={onClose} sx={{ color: "#9c44ce" }}><CloseIcon /></IconButton>
         </Box>
         <Divider sx={{ my: 0.5 }} />
 
         {/* Scrollable Content */}
         <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, pr: 1 }}>
-  {cartItems.length === 0 ? (
-    <Typography sx={{ mt: 2 }}>No items in the cart.</Typography>
-  ) : (
-    <List>
-      {cartItems.map(item => (
-        <ListItem key={item._id} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 2 }}>
-          <ListItemAvatar>
-            <Avatar variant="rounded" src={item.image || 'https://via.placeholder.com/100'} sx={{ width: 64, height: 64, mr: 2 }} />
-          </ListItemAvatar>
-          <ListItemText
-            primary={item.name}
-            secondary={
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 , color:"#9c44ce"}}>
-                <IconButton size="small" sx={{color:"#9c89ce"}} onClick={() => changeQuantity(item._id, item.quantity - 1)}>
-                  <RemoveCircleOutlineIcon fontSize="small" />
-                </IconButton>
-                <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
-                <IconButton size="small" sx={{color:"#9c89ce"}} onClick={() => changeQuantity(item._id, item.quantity + 1)}>
-                  <AddCircleOutlineIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            }
-          />
-          <Box sx={{ textAlign: 'right' }}>
-            <Typography fontWeight="bold">₹ {item.price * item.quantity}</Typography>
-            <Button size="small" color="error" onClick={() => removeFromCart(item._id)} sx={{ mt: 1 }}>
-              Remove
+          {cartItems.length === 0 ? (
+            <Typography sx={{ mt: 2 }}>No items in the cart.</Typography>
+          ) : (
+            <List>
+              {cartItems.map(item => (
+                <ListItem key={item._id} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 2 }}>
+                  <ListItemAvatar>
+                    <Avatar variant="rounded" src={item.image || 'https://via.placeholder.com/100'} sx={{ width: 64, height: 64, mr: 2 }} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={item.name}
+                    secondary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, color: "#9c44ce" }}>
+                        <IconButton size="small" sx={{ color: "#9c89ce" }} onClick={() => changeQuantity(item._id, item.quantity - 1)}>
+                          <RemoveCircleOutlineIcon fontSize="small" />
+                        </IconButton>
+                        <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
+                        <IconButton size="small" sx={{ color: "#9c89ce" }} onClick={() => changeQuantity(item._id, item.quantity + 1)}>
+                          <AddCircleOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    }
+                  />
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography fontWeight="bold">₹ {item.price * item.quantity}</Typography>
+                    <Button size="small" color="error" onClick={() => removeFromCart(item._id)} sx={{ mt: 1 }}>
+                      Remove
+                    </Button>
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          )}
+
+          {/* Payment Summary Toggle */}
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', mt: 2 }}
+            onClick={() => setShowPriceBreakdown(!showPriceBreakdown)}
+          >
+            <Box>
+              <Typography variant="subtitle1" fontWeight="bold">To Pay</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ color: "#9c89ce" }} >(Incl. all taxes and charges)</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" fontWeight="bold" >₹ {(finalTotal + totalGST).toFixed(2)}</Typography>
+              {showPriceBreakdown ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </Box>
+          </Box>
+
+          <Collapse in={showPriceBreakdown} timeout="auto" unmountOnExit sx={{ mt: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ color: "#9c44ce" }} >Item Total</Typography>
+              <Typography variant="body2" sx={{ color: "#9c89ce" }} >₹ {finalTotal.toFixed(2)}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ color: "#9c44ce" }} >GST (Incl.)</Typography>
+              <Typography variant="body2" sx={{ color: "#9c89ce" }} >₹ {totalGST.toFixed(2)}</Typography>
+            </Box>
+          </Collapse>
+
+          {/* Payment Options */}
+          <RadioGroup
+            value={paymentMode}
+            onChange={(e) => setPaymentMode(e.target.value)}
+            sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 5, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <FormControlLabel value="Cash on Delivery" control={<Radio size="small" color="error" />} label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Cash on Delivery</Typography>} />
+            <FormControlLabel value="Razorpay" control={<Radio size="small" color="error" />} label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Razorpay</Typography>} />
+          </RadioGroup>
+
+          <Button variant="outlined" fullWidth sx={{ mt: 2, fontSize: '0.8rem', color: "#ddd", borderColor: "#ddd", fontWeight: "bold" }} onClick={handleDetectLocation}>
+            Current Location
+          </Button>
+          {fetchedAddress && (
+            <Typography variant="subtitle2" sx={{ mt: 1, color: 'text.secondary' }}>
+              {fetchedAddress}
+            </Typography>
+          )}
+
+          {/* Saved Addresses Section */}
+          <Box sx={{ cursor: 'pointer', mt: 2 }} onClick={handleToggleAddresses}>
+            <Typography variant="subtitle1" fontWeight="bold">Saved Addresses</Typography>
+            {addressesOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </Box>
+
+          <Collapse in={addressesOpen} timeout="auto" unmountOnExit sx={{ mt: 1 }}>
+            <Box sx={{ maxHeight: 130, overflowY: 'auto', pr: 1, mb: 2 }}>
+              <List>
+                {savedAddresses.map((savedAddress, index) => (
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={() => handleSelectAddress(savedAddress)}
+                    sx={{ mb: 1, border: '1px solid #ddd', borderRadius: 2 }}
+                  >
+                    <ListItemText
+                      primary={`${savedAddress.house}, ${savedAddress.area}`}
+                      secondary={`Landmark: ${savedAddress.landmark}`}
+                      secondaryTypographyProps={{ style: { color: '#ddd' } }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Collapse>
+
+          {/* Address Input Fields */}
+          <Box sx={{ mt: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="House No. & Block No."
+              sx={{
+                mt: 1,
+                '& .MuiInputBase-root': {
+                  color: 'white', // text color
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.3)', // label color
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', // border color
+                },
+              }}
+              value={address.house}
+              onChange={(e) => setAddress({ ...address, house: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              size="small"
+              label="Landmark & Area Name"
+              sx={{
+                mt: 1,
+                '& .MuiInputBase-root': {
+                  color: 'white', // text color
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.3)', // label color
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', // border color
+                },
+              }}
+              value={address.area}
+              onChange={(e) => setAddress({ ...address, area: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              size='small'
+              label="Village Name & Pincode"
+              sx={{
+                mt: 1,
+                '& .MuiInputBase-root': {
+                  color: 'white', // text color
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.3)', // label color
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', // border color
+                },
+              }}
+              value={address.landmark}
+              onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
+            />
+
+            <Button variant="contained" fullWidth sx={{
+              mt: 2, textTransform: "none",
+              backgroundColor: "rgba(74, 12, 110, 0.88)",
+              color: "rgba(244, 244, 244, 0.88)",
+              "&:hover": {
+                backgroundColor: "rgba(147, 9, 147, 0.88)",
+                color: "rgba(255, 255, 255, 0.88)" // a slightly darker shade for hover
+              },
+            }} onClick={handleProceedPayment}>
+              CHECK OUT
+            </Button>
+            <Button variant="outlined" fullWidth
+              sx={{
+                mt: 1, color: "#ddd",
+                borderColor: "#02002ee0",
+                "&:hover": {
+                  backgroundColor: "#02002ee0",
+                  borderColor: "#02002ee0",
+                  color: "#ccc"
+                },
+              }} onClick={clearCart}>
+              Clear Cart
             </Button>
           </Box>
-        </ListItem>
-      ))}
-    </List>
-  )}
-
-  {/* Payment Summary Toggle */}
-  <Box
-    sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', mt: 2 }}
-    onClick={() => setShowPriceBreakdown(!showPriceBreakdown)}
-  >
-    <Box>
-      <Typography variant="subtitle1" fontWeight="bold">To Pay</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{color:"#9c89ce"}} >(Incl. all taxes and charges)</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Typography variant="subtitle1" fontWeight="bold" >₹ {(finalTotal + totalGST).toFixed(2)}</Typography>
-      {showPriceBreakdown ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-    </Box>
-  </Box>
-
-  <Collapse in={showPriceBreakdown} timeout="auto" unmountOnExit sx={{ mt: 1 }}>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-      <Typography variant="body2" color="text.secondary"sx={{color:"#9c44ce"}} >Item Total</Typography>
-      <Typography variant="body2" sx={{color:"#9c89ce"}} >₹ {finalTotal.toFixed(2)}</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-      <Typography variant="body2" color="text.secondary" sx={{color:"#9c44ce"}} >GST (Incl.)</Typography>
-      <Typography variant="body2"  sx={{color:"#9c89ce"}} >₹ {totalGST.toFixed(2)}</Typography>
-    </Box>
-  </Collapse>
-
-  {/* Payment Options */}
-  <RadioGroup
-    value={paymentMode}
-    onChange={(e) => setPaymentMode(e.target.value)}
-    sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 5, justifyContent: 'center', alignItems: 'center' }}
-  >
-    <FormControlLabel value="Cash on Delivery" control={<Radio size="small" color="error" />} label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Cash on Delivery</Typography>} />
-    <FormControlLabel value="Razorpay" control={<Radio size="small" color="error" />} label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Razorpay</Typography>} />
-  </RadioGroup>
-
-  <Button variant="outlined" fullWidth sx={{ mt: 2, fontSize: '0.8rem', color:"#ddd",borderColor:"#ddd", fontWeight:"bold" }} onClick={handleDetectLocation}>
-    Current Location
-  </Button>
-  {fetchedAddress && (
-    <Typography variant="subtitle2" sx={{ mt: 1, color: 'text.secondary' }}>
-      {fetchedAddress}
-    </Typography>
-  )}
-
-  {/* Saved Addresses Section */}
-  <Box sx={{ cursor: 'pointer', mt: 2}} onClick={handleToggleAddresses}>
-    <Typography variant="subtitle1" fontWeight="bold">Saved Addresses</Typography>
-    {addressesOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-  </Box>
-
-  <Collapse in={addressesOpen} timeout="auto" unmountOnExit sx={{ mt: 1 }}>
-    <Box sx={{ maxHeight: 130, overflowY: 'auto', pr: 1, mb: 2 }}>
-      <List>
-        {savedAddresses.map((savedAddress, index) => (
-          <ListItem
-            button
-            key={index}
-            onClick={() => handleSelectAddress(savedAddress)}
-            sx={{ mb: 1, border: '1px solid #ddd', borderRadius: 2 }}
-          >
-            <ListItemText 
-              primary={`${savedAddress.house}, ${savedAddress.area}`}
-              secondary={`Landmark: ${savedAddress.landmark}`}
-              secondaryTypographyProps={{ style: { color: '#ddd' } }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  </Collapse>
-
-  {/* Address Input Fields */}
-  <Box sx={{ mt: 1}}>
-    <TextField
-      fullWidth
-      size="small"
-      label="House No. & Block No."
-      sx={{ mt: 1,
-        '& .MuiInputBase-root': {
-        color: 'white', // text color
-        },
-        '& .MuiInputLabel-root': {
-        color: 'rgba(255, 255, 255, 0.3)', // label color
-        },
-        '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'white', // border color
-        },}}
-      value={address.house}
-      onChange={(e) => setAddress({ ...address, house: e.target.value })}
-    />
-    <TextField
-      fullWidth
-      size="small"
-      label="Landmark & Area Name"
-      sx={{ mt: 1,
-        '& .MuiInputBase-root': {
-        color: 'white', // text color
-        },
-        '& .MuiInputLabel-root': {
-        color: 'rgba(255, 255, 255, 0.3)', // label color
-        },
-        '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'white', // border color
-        },}}
-      value={address.area}
-      onChange={(e) => setAddress({ ...address, area: e.target.value })}
-    />
-    <TextField
-      fullWidth
-      size='small'
-      label="Village Name & Pincode"
-      sx={{ mt: 1,
-        '& .MuiInputBase-root': {
-        color: 'white', // text color
-        },
-        '& .MuiInputLabel-root': {
-          color: 'rgba(255, 255, 255, 0.3)', // label color
-        },
-        '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'white', // border color
-        },}}
-      value={address.landmark}
-      onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
-    />
-
-    <Button variant="contained" fullWidth sx={{ mt: 2, textTransform: "none",
-    backgroundColor: "rgba(74, 12, 110, 0.88)",
-    color: "rgba(244, 244, 244, 0.88)",
-    "&:hover": {
-      backgroundColor: "rgba(147, 9, 147, 0.88)",
-      color:"rgba(255, 255, 255, 0.88)" // a slightly darker shade for hover
-    }, }} onClick={handleProceedPayment}>
-      CHECK OUT
-    </Button>
-    <Button variant="outlined" fullWidth 
-    sx={{ mt: 1,color: "#ddd",
-      borderColor: "#02002ee0",
-      "&:hover": {
-        backgroundColor: "#02002ee0",
-        borderColor: "#02002ee0",
-        color:"#ccc"}, }} onClick={clearCart}>
-      Clear Cart
-    </Button>
-  </Box>
-</Box>
+        </Box>
 
       </Box>
 
@@ -463,4 +472,4 @@ export default function CartDrawer({ open, onClose }) {
       </Dialog>
     </Drawer>
   );
-  }
+}
