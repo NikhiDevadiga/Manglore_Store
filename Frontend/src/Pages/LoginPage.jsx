@@ -171,6 +171,13 @@ function Login() {
               Sign Up
             </Link>
           </Typography>
+
+          <Typography mt={1.5} textAlign="center" fontSize="14px">
+            Are you Admin?{" "}
+            <Link to="/admin" style={{ color: "#9c44ce", fontWeight: "bold" }}>
+              login
+            </Link>
+          </Typography>
         </Paper>
       </Container>
     </Box>
