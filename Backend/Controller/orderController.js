@@ -2,55 +2,29 @@ import mongoose from "mongoose";
 import Order from "../Model/orderModel.js";
 import Product from "../Model/productModel.js";
 
-function convertToBaseUnit(quantity, unit) {
-  switch (unit) {
-    case 'kg': return quantity * 1000;
-    case 'g': return quantity;
-    case 'liter': return quantity * 1000;
-    case 'ml': return quantity;
-    case 'unit': return quantity;
-    default: throw new Error(`Unsupported unit: ${unit}`);
-  }
-}
-
-function convertFromBaseUnit(baseQuantity, targetUnit) {
-  switch (targetUnit) {
-    case 'kg': return baseQuantity / 1000;
-    case 'g': return baseQuantity;
-    case 'liter': return baseQuantity / 1000;
-    case 'ml': return baseQuantity;
-    case 'unit': return baseQuantity;
-    default: throw new Error(`Unsupported unit: ${targetUnit}`);
-  }
-}
-
 export const createOrder = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     const { items } = req.body;
 
+    // 1. Loop through each item and reduce stock
     for (const item of items) {
-      const product = await Product.findById(item._id).session(session);
+      const product = await Product.findById(item._id).session(session); // Using _id based on your request body
+
       if (!product) {
         throw new Error(`Product not found: ${item._id}`);
       }
 
-      // Convert both product stock and ordered quantity to base units (grams/ml/etc.)
-      const productStockBase = convertToBaseUnit(product.stockquantity, product.stockunit);
-      const orderedQtyBase = convertToBaseUnit(item.quantity, item.unit); // unit from request
-
-      if (orderedQtyBase > productStockBase) {
+      if (product.stock < item.quantity) {
         throw new Error(`Not enough stock for: ${product.name}`);
       }
 
-      const updatedStockBase = productStockBase - orderedQtyBase;
-      product.stockquantity = convertFromBaseUnit(updatedStockBase, product.stockunit);
-
+      product.stock -= item.quantity; // Reduce stock based on quantity
       await product.save({ session });
     }
 
+    // 2. Create the order
     const newOrder = new Order(req.body);
     await newOrder.save({ session });
 
