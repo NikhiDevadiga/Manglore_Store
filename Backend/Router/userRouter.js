@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/registration',registrationmodel)
 router.post('/login',loginmodel)
 router.get('/users/list',getUser)
-router.get('/user/:id', getUserById);
+router.get('/userlist/:id',getUserById)
 router.put('/update/:id',updateUser)
 router.post("/forgotpassword", forgotPassword);
 router.post("/resetpassword", resetPassword);
