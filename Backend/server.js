@@ -20,7 +20,7 @@ const app = express();
 
 // Get __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
+const __dirname = dirname(__filename);
 
 // Define PORT
 const PORT = process.env.PORT || 5000;
