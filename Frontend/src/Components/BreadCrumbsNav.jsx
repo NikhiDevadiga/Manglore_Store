@@ -15,7 +15,7 @@ const BreadcrumbsNav = () => {
   useEffect(() => {
     if (categoryId) {
       axios
-      axios.get(`http://localhost:5000/api/${categoryId}`)
+      axios.get(`https://manglore-store-t98r.onrender.com/api/${categoryId}`)
         .then((res) => setCategoryName(res.data?.data?.name || "Category"))
         .catch(() => setCategoryName("Category"));
     }
@@ -25,7 +25,7 @@ const BreadcrumbsNav = () => {
   useEffect(() => {
     if (subcategoryId) {
       axios
-        .get(`http://localhost:5000/api/product/${subcategoryId}`)
+        .get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`)
         .then((res) => setSubcategoryName(res.data?.data?.name || "Subcategory"))
         .catch(() => setSubcategoryName("Subcategory"));
     }
