@@ -41,7 +41,7 @@ const Navbar = () => {
     const fetchOrders = async () => {
       setLoadingOrders(true);
       try {
-        const res = await axios.get(`/api/user/${user._id}`);
+        const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/user/${user._id}`);
         setOrders(res.data);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
