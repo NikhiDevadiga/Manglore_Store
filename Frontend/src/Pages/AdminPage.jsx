@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import OrdersPanel from "./OrderPanel";
 
 const gstOptions = Array.from({length:19},(_,i) =>i);
-const API_BASE = "https://manglore-store-t98r.onrender.com/api";
+const API_BASE = "http://localhost:5000/api";
 
 const AdminPage = () => {
   const [activeMainTab, setActiveMainTab] = useState("itemDetails"); // New
@@ -30,7 +30,7 @@ const AdminPage = () => {
   const [forms, setForms] = useState({
     category: { name: "", image: null },
     subcategory: { name: "", cat_id: "", image: null },
-    product: { name: "", price: "",gst:"",quantity:"",unit:"", description: "", cat_id: "", subcat_id: "",stockquantity:"",stockunit:"", image: null },
+    product: { name: "", price: "",gst:"",quantity:"",unit:"", description: "", cat_id: "", subcat_id: "",stock:"", image: null },
   });
 
   const [searchTerm, setSearchTerm] = useState(""); // New for search
@@ -112,8 +112,7 @@ const AdminPage = () => {
       image: null,
       cat_id: item.cat_id?._id || item.cat_id || "",
       subcat_id: item.subcat_id?._id || item.subcat_id || "",
-      stockquantity: item.stockquantity || "",
-      stockunit: item.stockunit || ""
+      stock: item.stock || ""
     });
   };
 
@@ -187,23 +186,7 @@ const AdminPage = () => {
             </FormControl>
             <TextField fullWidth select name="gst" label="GST" value={form.gst || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }}>{gstOptions.map((value) => (<MenuItem key={value} value={value}>{value}%</MenuItem>))}</TextField>
             <TextField fullWidth name="description" label="Description" value={form.description || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
-            <TextField fullWidth name="stockquantity" label="Available Stock" value={form.stockquantity || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="unit-label">Stock Unit</InputLabel>
-              <Select
-                labelId="unit"
-                name="stockunit"
-                value={form.unit || ""}
-                label="Stock-Unit"
-                onChange={(e) => handleFormChange(e, activeSection)}
-              >
-                <MenuItem value="kg">kg</MenuItem>
-                <MenuItem value="g">g</MenuItem>
-                <MenuItem value="liter">liter</MenuItem>
-                <MenuItem value="ml">ml</MenuItem>
-                <MenuItem value="unit">unit</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField fullWidth name="stock" label="Available Stock" value={form.stock || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
           </>
         )}
         {["subcategory", "product"].includes(activeSection) && (
@@ -239,7 +222,7 @@ const AdminPage = () => {
           <TableHead>
             <TableRow>
               {["Image", "Name", ...(activeSection === "subcategory" ? ["Category"] : []),
-                ...(activeSection === "product" ? ["Price","Quantity","Unit","Gst", "Description", "Category", "Subcategory","Available Stock","Stock Unit"] : []), "Actions"]
+                ...(activeSection === "product" ? ["Price","Quantity","Unit","Gst", "Description", "Category", "Subcategory","Available Stock"] : []), "Actions"]
                 .map((h, i) => <TableCell key={i} sx={{fontWeight:"bold", color:"#02002ee0"}}>{h}</TableCell>)}
             </TableRow>
           </TableHead>
@@ -382,27 +365,8 @@ const AdminPage = () => {
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="stockquantity" multiline rows={3} value={editFields.stockquantity} onChange={(e) => setEditFields({ ...editFields, stockquantity: e.target.value })} sx={{ mb: 1 }}/>
-                      ) : item.stockquantity}
-                    </TableCell>
-                    <TableCell>
-                      {editItem === item._id ? (
-                        <FormControl fullWidth sx={{ mb: 1 }}>
-                          <Select
-                            name="stockunit"
-                            value={editFields.unit}
-                            onChange={(e) => setEditFields({ ...editFields, stockunit: e.target.value })}
-                          >
-                            <MenuItem value="kg">kg</MenuItem>
-                            <MenuItem value="g">g</MenuItem>
-                            <MenuItem value="liter">liter</MenuItem>
-                            <MenuItem value="ml">ml</MenuItem>
-                            <MenuItem value="unit">unit</MenuItem>
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        item.stockunit
-                      )}
+                        <TextField fullWidth name="stock" multiline rows={3} value={editFields.stock} onChange={(e) => setEditFields({ ...editFields, stock: e.target.value })} sx={{ mb: 1 }}/>
+                      ) : item.stock}
                     </TableCell>
                   </>
                 )}
