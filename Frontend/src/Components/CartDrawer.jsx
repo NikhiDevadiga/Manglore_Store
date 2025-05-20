@@ -143,7 +143,7 @@ export default function CartDrawer({ open, onClose }) {
     const user = JSON.parse(localStorage.getItem('user'));
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/address/${user._id}`,
+        `https://manglore-store-t98r.onrender.com/api/address/${user._id}`,
         address, 
         {
           headers: {
