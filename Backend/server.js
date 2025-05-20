@@ -5,48 +5,49 @@ import SubCatRouter from "./Router/subcategoryRouter.js";
 import ProductRouter from "./Router/productRouter.js";
 import CatRouter from "./Router/categoryRouter.js";
 import UserRouter from "./Router/userRouter.js";
+import ContactusRouter from "./Router/contactusRouter.js";
 import cors from "cors";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import ContactusRouter from "./Router/contactusRouter.js";
 import nodemailer from "nodemailer";
 
 // Load environment variables
 dotenv.config();
 
-// Setup Express app
+// Initialize Express
 const app = express();
 
-// Get __dirname in ES modules
+// Get __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const _dirname = dirname(_filename);
 
-// Define port
+// Define PORT
 const PORT = process.env.PORT || 5000;
 
-// Allowed origins for CORS
+// Allowed CORS origins
 const allowedOrigins = [
   "https://manglore-store-t98r.onrender.com", // production
-  "http://localhost:5173"                // local dev
+  "http://localhost:5173"                     // local dev
 ];
 
-// CORS middleware
+// CORS setup
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., mobile apps, curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
     } else {
-      return callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
 }));
 
-// Enable parsing of JSON bodies
+// JSON parser
 app.use(express.json());
+
+// Serve static image files
+app.use('/Backend/Images', express.static(path.join(__dirname, 'Images')));
 
 // API Routes
 app.use("/api", CatRouter);
@@ -55,17 +56,7 @@ app.use("/api", SubCatRouter);
 app.use("/api", UserRouter);
 app.use("/api", ContactusRouter);
 
-// Static folder for images
-app.use('/Backend/Images', express.static(path.join(__dirname, 'Images')));
-
-// Start the server
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server started at http://localhost:${PORT}`);
-
-});
-
-// Nodemailer transporter
+// Nodemailer setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -76,28 +67,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Example mail options (can be moved to a route later)
-const mailOptions = {
-  from: process.env.EMAIL_USER,
-  to: 'recipient@example.com',
-  subject: 'Test Email from Nodemailer',
-  text: 'Hello, this is a test email!',
-};
-
-// Send test email
-transporter.sendMail(mailOptions, (error, info) => {
+// Verify transporter once on server start
+transporter.verify((error, success) => {
   if (error) {
-    console.log('Error occurred:', error);
+    console.error('Email transporter verification failed:', error);
   } else {
-    console.log('Email sent:', info.response);
+    console.log('Nodemailer transporter is ready to send emails');
   }
 });
 
-// Verify mail transporter
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Error verifying transporter:', error);
-  } else {
-    console.log('Nodemailer is ready for use');
-  }
+// Start the server
+app.listen(PORT, () => {
+  connectDB();
+  console.log(✅ Server is running at http://localhost:${PORT});
 });
