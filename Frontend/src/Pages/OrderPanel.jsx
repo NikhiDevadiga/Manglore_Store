@@ -41,14 +41,6 @@ export default function OrdersPanel() {
   const handleFilterChange = (event) => setFilter(event.target.value);
   const handleSortChange = (event) => setSort(event.target.value);
 
-  // Filter + sort + date filter
-  const processedOrders = orders
-    .filter(order => {
-      const mode = order.paymentMode?.toLowerCase();
-      if (filter === 'cod') return mode === 'cash on delivery';
-      if (filter === 'razorpay') return mode?.includes('razorpay');
-      return true;
-    })
     const processedOrders = orders
     .filter(order => {
       const mode = order.paymentMode?.toLowerCase();
