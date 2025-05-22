@@ -62,3 +62,12 @@ export const deleteCat = async(req,res) => {
         res.status(500).json({success:false, message: "Server Error"});
    }
 };
+
+export const getCategoryById = async (req, res) => {
+  try {
+    const category = await Cat.findById(req.params.id);
+    res.status(200).json({ success: true, data: category });
+  } catch (err) {
+    res.status(404).json({ message: "Category not found" });
+  }
+};
