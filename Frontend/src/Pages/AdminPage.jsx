@@ -3,13 +3,13 @@ import axios from "axios";
 import {
   Box, Button, ButtonGroup, TextField, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, IconButton, Dialog, DialogTitle,
-  DialogContent, DialogActions, AppBar, Toolbar, Typography, InputBase,MenuItem,FormControl, InputLabel, Select
+  DialogContent, DialogActions, AppBar, Toolbar, Typography, InputBase, MenuItem, FormControl, InputLabel, Select
 } from "@mui/material";
 import { Add, Edit, Delete, Logout } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import OrdersPanel from "./OrderPanel";
 
-const gstOptions = Array.from({length:19},(_,i) =>i);
+const gstOptions = Array.from({ length: 19 }, (_, i) => i);
 const API_BASE = "http://localhost:5000/api";
 
 const AdminPage = () => {
@@ -26,11 +26,11 @@ const AdminPage = () => {
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     itemId: null
-  });  
+  });
   const [forms, setForms] = useState({
     category: { name: "", image: null },
     subcategory: { name: "", cat_id: "", image: null },
-    product: { name: "", price: "",gst:"",quantity:"",unit:"", description: "", cat_id: "", subcat_id: "",stock:"", image: null },
+    product: { name: "", price: "", gst: "", weight: "", unit: "", description: "", cat_id: "", subcat_id: "", stockquantity: "", stockunit: "", image: null },
   });
 
   const [searchTerm, setSearchTerm] = useState(""); // New for search
@@ -64,17 +64,17 @@ const AdminPage = () => {
         .then(res => setUserQueries(res.data.data))
         .catch(err => console.error("Error fetching user queries:", err));
     }
-  }, [activeMainTab]);  
+  }, [activeMainTab]);
 
   //for fetching users list
   const [users, setUsers] = useState([]);
   useEffect(() => {
-  if (activeMainTab === "userDetails") {
-    axios.get(`${API_BASE}/users/list`)
-      .then(res => setUsers(res.data.data))  // or just res.data if no wrapping
-      .catch(err => console.error("Error fetching users:", err));
-  }
-}, [activeMainTab]);
+    if (activeMainTab === "userDetails") {
+      axios.get(`${API_BASE}/users/list`)
+        .then(res => setUsers(res.data.data))  // or just res.data if no wrapping
+        .catch(err => console.error("Error fetching users:", err));
+    }
+  }, [activeMainTab]);
 
   const handleFormChange = (e, section) => {
     const { name, value } = e.target;
@@ -105,20 +105,27 @@ const AdminPage = () => {
     setEditFields({
       name: item.name || "",
       price: item.price || "",
-      quantity: item.quantity || "",
+      weight: item.weight || "",
       unit: item.unit || "",
       gst: item.gst || "",
       description: item.description || "",
       image: null,
       cat_id: item.cat_id?._id || item.cat_id || "",
       subcat_id: item.subcat_id?._id || item.subcat_id || "",
-      stock: item.stock || ""
+      stockquantity: item.stockquantity || "",
+      stockunit: item.stockunit || "",
+
     });
   };
 
   const handleUpdate = async (id) => {
     const form = new FormData();
-    Object.entries(editFields).forEach(([key, val]) => val && form.append(key, val));
+    Object.entries(editFields).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        form.append(key, val);
+      }
+    });
+
     try {
       await axios.put(`${API_BASE}/${activeSection}/${id}`, form);
       alert("Updated!");
@@ -148,7 +155,7 @@ const AdminPage = () => {
       alert("Error deleting user query.");
       console.error(err);
     }
-  };  
+  };
 
   const navigate = useNavigate();
 
@@ -163,11 +170,11 @@ const AdminPage = () => {
     const form = forms[activeSection];
     return (
       <>
-        <TextField fullWidth name="name" label="Name" value={form.name || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb:2 }} />
+        <TextField fullWidth name="name" label="Name" value={form.name || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
         {activeSection === "product" && (
           <>
             <TextField fullWidth name="price" label="Price" value={form.price || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
-            <TextField fullWidth name="quantity" label="Quantity" value={form.quantity || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
+            <TextField fullWidth name="weight" label="Quantity" value={form.weight || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id="unit-label">Unit</InputLabel>
               <Select
@@ -186,17 +193,33 @@ const AdminPage = () => {
             </FormControl>
             <TextField fullWidth select name="gst" label="GST" value={form.gst || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }}>{gstOptions.map((value) => (<MenuItem key={value} value={value}>{value}%</MenuItem>))}</TextField>
             <TextField fullWidth name="description" label="Description" value={form.description || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
-            <TextField fullWidth name="stock" label="Available Stock" value={form.stock || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
+            <TextField fullWidth name="stockquantity" label="Available Stock" value={form.stockquantity || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="unit-label">Stock Unit</InputLabel>
+              <Select
+                labelId="stockunit"
+                name="stockunit"
+                value={form.stockunit || ""}
+                label="Stock-Unit"
+                onChange={(e) => handleFormChange(e, activeSection)}
+              >
+                <MenuItem value="kg">kg</MenuItem>
+                <MenuItem value="g">g</MenuItem>
+                <MenuItem value="liter">liter</MenuItem>
+                <MenuItem value="ml">ml</MenuItem>
+                <MenuItem value="unit">unit</MenuItem>
+              </Select>
+            </FormControl>
           </>
         )}
         {["subcategory", "product"].includes(activeSection) && (
-          <select name="cat_id" value={form.cat_id} onChange={(e) => handleFormChange(e, activeSection)} style={{ width: "100%", marginBottom: 16, height:"50px", fontSize:"16px", padding:"8px"}}>
+          <select name="cat_id" value={form.cat_id} onChange={(e) => handleFormChange(e, activeSection)} style={{ width: "100%", marginBottom: 16, height: "50px", fontSize: "16px", padding: "8px" }}>
             <option value="">Select Category</option>
             {data.category.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
           </select>
         )}
         {activeSection === "product" && (
-          <select name="subcat_id" value={form.subcat_id} onChange={(e) => handleFormChange(e, activeSection)} style={{ width: "100%", marginBottom: 16, height:"50px", fontSize:"16px", padding:"8px" }}>
+          <select name="subcat_id" value={form.subcat_id} onChange={(e) => handleFormChange(e, activeSection)} style={{ width: "100%", marginBottom: 16, height: "50px", fontSize: "16px", padding: "8px" }}>
             <option value="">Select Subcategory</option>
             {data.subcategory.filter(sub => (sub.cat_id?._id || sub.cat_id) === form.cat_id)
               .map(sub => <option key={sub._id} value={sub._id}>{sub.name}</option>)}
@@ -209,21 +232,24 @@ const AdminPage = () => {
 
   const renderTable = () => {
     let sectionData = data[activeSection];
-  
+
     if (searchTerm.trim()) {
       sectionData = sectionData.filter(item =>
-        item.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+        item.name
+          .toLowerCase()
+          .split(' ')
+          .some(word => word.startsWith(searchTerm.toLowerCase()))
       );
     }
-  
+
     return (
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               {["Image", "Name", ...(activeSection === "subcategory" ? ["Category"] : []),
-                ...(activeSection === "product" ? ["Price","Quantity","Unit","Gst", "Description", "Category", "Subcategory","Available Stock"] : []), "Actions"]
-                .map((h, i) => <TableCell key={i} sx={{fontWeight:"bold", color:"#02002ee0"}}>{h}</TableCell>)}
+                ...(activeSection === "product" ? ["Price", "Quantity", "Unit", "Gst", "Description", "Category", "Subcategory", "Available Stock", "Stock Unit"] : []), "Actions"]
+                .map((h, i) => <TableCell key={i} sx={{ fontWeight: "bold", color: "#02002ee0" }}>{h}</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -246,19 +272,19 @@ const AdminPage = () => {
                     <TextField fullWidth name="name" value={editFields.name} onChange={(e) => setEditFields({ ...editFields, name: e.target.value })} />
                   ) : item.name}
                 </TableCell>
-  
+
                 {activeSection === "subcategory" && (
                   <TableCell>
                     {editItem === item._id ? (
                       <select name="cat_id" value={editFields.cat_id} onChange={(e) => setEditFields({ ...editFields, cat_id: e.target.value })}
-                      style={{
-                        width: "100%",
-                        height: "56px",
-                        fontSize: "16px",
-                        padding: "0 14px",
-                        borderRadius: "4px",
-                        border: "1px solid rgba(0,0,0,0.23)"
-                      }}>
+                        style={{
+                          width: "100%",
+                          height: "56px",
+                          fontSize: "16px",
+                          padding: "0 14px",
+                          borderRadius: "4px",
+                          border: "1px solid rgba(0,0,0,0.23)"
+                        }}>
                         <option value="">Select</option>
                         {data.category.map(cat => (
                           <option key={cat._id} value={cat._id}>{cat.name}</option>
@@ -267,18 +293,18 @@ const AdminPage = () => {
                     ) : data.category.find(cat => cat._id === (item.cat_id?._id || item.cat_id))?.name}
                   </TableCell>
                 )}
-   
+
                 {activeSection === "product" && (
                   <>
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="price" value={editFields.price} onChange={(e) => setEditFields({ ...editFields, price: e.target.value })} sx={{ mb: 1 }}/>
+                        <TextField fullWidth name="price" value={editFields.price} onChange={(e) => setEditFields({ ...editFields, price: e.target.value })} sx={{ mb: 1 }} />
                       ) : item.price}
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="quantity" value={editFields.quantity} onChange={(e) => setEditFields({ ...editFields, quantity: e.target.value })} sx={{ mb: 1 }}/>
-                      ) : item.quantity}
+                        <TextField fullWidth name="weight" value={editFields.weight} onChange={(e) => setEditFields({ ...editFields, weight: e.target.value })} sx={{ mb: 1 }} />
+                      ) : item.weight}
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
@@ -323,21 +349,21 @@ const AdminPage = () => {
 
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="description" multiline rows={3} value={editFields.description} onChange={(e) => setEditFields({ ...editFields, description: e.target.value })} sx={{ mb: 1 }}/>
+                        <TextField fullWidth name="description" multiline rows={3} value={editFields.description} onChange={(e) => setEditFields({ ...editFields, description: e.target.value })} sx={{ mb: 1 }} />
                       ) : item.description}
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
                         <select name="cat_id" value={editFields.cat_id} onChange={(e) => setEditFields({ ...editFields, cat_id: e.target.value })}
-                        SelectProps={{ native: true }} sx={{ flex: 1 }}
-                        style={{
-                          width: "100%",
-                          height: "56px",
-                          fontSize: "16px",
-                          padding: "0 14px",
-                          borderRadius: "4px",
-                          border: "1px solid rgba(0,0,0,0.23)"
-                        }}>
+                          SelectProps={{ native: true }} sx={{ flex: 1 }}
+                          style={{
+                            width: "100%",
+                            height: "56px",
+                            fontSize: "16px",
+                            padding: "0 14px",
+                            borderRadius: "4px",
+                            border: "1px solid rgba(0,0,0,0.23)"
+                          }}>
                           <option value="">Select</option>
                           {data.category.map(cat => (
                             <option key={cat._id} value={cat._id}>{cat.name}</option>
@@ -348,15 +374,15 @@ const AdminPage = () => {
                     <TableCell>
                       {editItem === item._id ? (
                         <select name="subcat_id" value={editFields.subcat_id} onChange={(e) => setEditFields({ ...editFields, subcat_id: e.target.value })}
-                        SelectProps={{ native: true }}sx={{ flex: 1 }}
-                        style={{
-                          width: "100%",
-                          height: "56px",
-                          fontSize: "16px",
-                          padding: "0 14px",
-                          borderRadius: "4px",
-                          border: "1px solid rgba(0,0,0,0.23)"
-                        }}>
+                          SelectProps={{ native: true }} sx={{ flex: 1 }}
+                          style={{
+                            width: "100%",
+                            height: "56px",
+                            fontSize: "16px",
+                            padding: "0 14px",
+                            borderRadius: "4px",
+                            border: "1px solid rgba(0,0,0,0.23)"
+                          }}>
                           <option value="">Select</option>
                           {data.subcategory.filter(sub => (sub.cat_id?._id || sub.cat_id) === editFields.cat_id)
                             .map(sub => <option key={sub._id} value={sub._id}>{sub.name}</option>)}
@@ -365,32 +391,51 @@ const AdminPage = () => {
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="stock" multiline rows={3} value={editFields.stock} onChange={(e) => setEditFields({ ...editFields, stock: e.target.value })} sx={{ mb: 1 }}/>
-                      ) : item.stock}
+                        <TextField fullWidth name="stockquantity" multiline rows={3} value={editFields.stockquantity} onChange={(e) => setEditFields({ ...editFields, stockquantity: e.target.value })} sx={{ mb: 1 }} />
+                      ) : item.stockquantity}
+                    </TableCell>
+                    <TableCell>
+                      {editItem === item._id ? (
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <Select
+                            name="stockunit"
+                            value={editFields.stockunit}
+                            onChange={(e) => setEditFields({ ...editFields, stockunit: e.target.value })}
+                          >
+                            <MenuItem value="kg">kg</MenuItem>
+                            <MenuItem value="g">g</MenuItem>
+                            <MenuItem value="liter">liter</MenuItem>
+                            <MenuItem value="ml">ml</MenuItem>
+                            <MenuItem value="unit">unit</MenuItem>
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        item.stockunit
+                      )}
                     </TableCell>
                   </>
                 )}
-  
+
                 <TableCell>
                   {editItem === item._id ? (
-                   <>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      style={{ backgroundColor: '#02002ee0', color: '#9c44ce' }}
-                      onClick={() => handleUpdate(item._id)}
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="text"
-                      style={{ color: '#9c44ce' }}
-                      onClick={() => setEditItem(null)}
-                    >
-                      Cancel
-                    </Button>
-                  </>
+                    <>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        style={{ backgroundColor: '#02002ee0', color: '#9c44ce' }}
+                        onClick={() => handleUpdate(item._id)}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="text"
+                        style={{ color: '#9c44ce' }}
+                        onClick={() => setEditItem(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </>
                   ) : (
                     <>
                       <IconButton onClick={() => handleEditClick(item)}>
@@ -409,12 +454,12 @@ const AdminPage = () => {
       </TableContainer>
     );
   };
-  
+
 
   return (
     <Box>
       {/* Topbar */}
-      <AppBar position="static" sx={{width:'100%', background:"#02002ee0"}}>
+      <AppBar position="static" sx={{ width: '100%', background: "#02002ee0" }}>
         <Toolbar disableGutters>
           <ButtonGroup variant="outlined" sx={{
             '& .MuiButton-root': {
@@ -439,7 +484,7 @@ const AdminPage = () => {
       </AppBar>
 
       {activeMainTab === "itemDetails" && (
-        <Box p={1}> 
+        <Box p={1}>
           {/* Search and Add */}
           <Box display="flex" flexDirection="column" alignItems="stretch" gap={2} mb={2} >
             <ButtonGroup variant="outlined">
@@ -486,8 +531,8 @@ const AdminPage = () => {
             <DialogTitle>Add {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</DialogTitle>
             <DialogContent>{renderFormFields()}</DialogContent>
             <DialogActions>
-              <Button sx={{color:"#9c44ce"}} onClick={() => setShowDialog(false)}>Cancel</Button>
-              <Button variant="contained" sx={{color:"#9c44ce", background:"#02002ee0"}} onClick={handleSubmit}>Save</Button>
+              <Button sx={{ color: "#9c44ce" }} onClick={() => setShowDialog(false)}>Cancel</Button>
+              <Button variant="contained" sx={{ color: "#9c44ce", background: "#02002ee0" }} onClick={handleSubmit}>Save</Button>
             </DialogActions>
           </Dialog>
         </Box>
@@ -526,66 +571,65 @@ const AdminPage = () => {
       )}
 
       {activeMainTab === "orderDetails" && <Box p={3}><OrdersPanel /></Box>}
-      
-      {activeMainTab === "userQueries" && (
-            <Box p={3}>
-              <Typography variant="h6" gutterBottom>User Queries</Typography>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Message</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {userQueries.map((query) => (
-                      <TableRow key={query._id}>
-                        <TableCell>{query.name}</TableCell>
-                        <TableCell>{query.email}</TableCell>
-                        <TableCell>{query.message}</TableCell>
-                        <TableCell>
-                          <IconButton color="error" onClick={() => handleUserQueryDelete(query._id)}>
-                            <Delete />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          )}
 
-          <Dialog
-            open={confirmDialog.open}
-            onClose={() => setConfirmDialog({ open: false, itemId: null })}
+      {activeMainTab === "userQueries" && (
+        <Box p={3}>
+          <Typography variant="h6" gutterBottom>User Queries</Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Message</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {userQueries.map((query) => (
+                  <TableRow key={query._id}>
+                    <TableCell>{query.name}</TableCell>
+                    <TableCell>{query.email}</TableCell>
+                    <TableCell>{query.message}</TableCell>
+                    <TableCell>
+                      <IconButton color="error" onClick={() => handleUserQueryDelete(query._id)}>
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
+
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ open: false, itemId: null })}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this item?
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text"
+            style={{ color: '#02002ee0' }} onClick={() => setConfirmDialog({ open: false, itemId: null })}>
+            Cancel
+          </Button>
+          <Button
+            style={{ color: '#9c44ce' }}
+            onClick={() => {
+              handleDelete(confirmDialog.itemId);
+              setConfirmDialog({ open: false, itemId: null });
+            }}
           >
-            <DialogTitle>Confirm Delete</DialogTitle>
-            <DialogContent>
-              Are you sure you want to delete this item?
-            </DialogContent>
-            <DialogActions>
-              <Button variant="text"
-                style={{ color: '#02002ee0' }} onClick={() => setConfirmDialog({ open: false, itemId: null })}>
-                Cancel
-              </Button>
-              <Button
-                style={{ color: '#9c44ce' }}
-                onClick={() => {
-                  handleDelete(confirmDialog.itemId);
-                  setConfirmDialog({ open: false, itemId: null });
-                }}
-              >
-                Yes, Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
-          </Box>
+            Yes, Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
 export default AdminPage;
- 
