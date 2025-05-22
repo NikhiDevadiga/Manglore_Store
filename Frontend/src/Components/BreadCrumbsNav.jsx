@@ -1,38 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Breadcrumbs, Link, Typography } from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const BreadcrumbsNav = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { categoryId, subcategoryId } = useParams();
 
   const [categoryName, setCategoryName] = useState("");
   const [subcategoryName, setSubcategoryName] = useState("");
 
-  // Fetch category name
+  // Fetch category name when categoryId changes
   useEffect(() => {
     if (categoryId) {
       axios
-      axios.get(`https://manglore-store-t98r.onrender.com/api/${categoryId}`)
-        .then((res) => setCategoryName(res.data?.data?.name || "Category"))
+        .get(`http://localhost:5000/api/categories/${categoryId}`)
+        .then((res) => {
+          const name = res?.data?.data?.name || "Category";
+          setCategoryName(name);
+        })
         .catch(() => setCategoryName("Category"));
+    } else {
+      setCategoryName("");
     }
   }, [categoryId]);
 
-  // Fetch subcategory name
+  // Fetch subcategory name when subcategoryId changes
   useEffect(() => {
     if (subcategoryId) {
       axios
-        .get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`)
-        .then((res) => setSubcategoryName(res.data?.data?.name || "Subcategory"))
+        .get(`http://localhost:5000/api/subcategories/${subcategoryId}`)
+        .then((res) => {
+          const name = res?.data?.data?.name || "Subcategory";
+          setSubcategoryName(name);
+        })
         .catch(() => setSubcategoryName("Subcategory"));
+    } else {
+      setSubcategoryName("");
     }
   }, [subcategoryId]);
 
   return (
     <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+      {/* Home always present */}
       <Link
         underline="hover"
         color="inherit"
@@ -42,6 +52,7 @@ const BreadcrumbsNav = () => {
         Home
       </Link>
 
+      {/* Category - clickable if categoryId exists */}
       {categoryId && (
         <Link
           underline="hover"
@@ -49,18 +60,15 @@ const BreadcrumbsNav = () => {
           onClick={() => navigate(`/category/${categoryId}`)}
           sx={{ cursor: "pointer" }}
         >
-          {categoryName}
+          {categoryName || "Category"}
         </Link>
       )}
 
+      {/* Subcategory - current page, so no link */}
       {subcategoryId && (
         <Typography color="text.primary">
-          {subcategoryName}
+          {subcategoryName || "Subcategory"}
         </Typography>
-      )}
-
-      {!categoryId && !subcategoryId && (
-        <Typography color="text.primary">Categories</Typography>
       )}
     </Breadcrumbs>
   );
