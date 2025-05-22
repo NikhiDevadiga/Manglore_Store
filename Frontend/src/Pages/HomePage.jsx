@@ -26,80 +26,12 @@ const ProductBrowser = () => {
       .catch((err) => console.error("Category fetch error:", err));
   }, []);
 
-  return (
+   return (
     <Box px={{ xs: 1, sm: 2, md: 4 }} py={2} mb={10}>
       <BreadCrumbs />
-      {/* Banner Section */}
-      <Grid container spacing={2} mb={4} justifyContent="center">
-        <Grid item xs={12}>
-          <Box
-            sx={{
-              backgroundColor: "#f4e6f6",
-              padding: 2,
-              borderRadius: 2,
-            }}
-          >
-            <Grid container spacing={2}>
-              {/* Food Grains Card */}
-              <Grid item xs={12} sm={6}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                  onClick={() => navigate("/product/6809c6a535fbcb19f6cd8156")}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/images/Food Grains.png"
-                    alt="Food Grains"
-                    sx={{
-                      width: {xs: 360, sm: 340, md: 680 },
-                      height: { xs: 110, sm:125, md: 250 },
-                      objectFit: "cover",
-                    }}
-                  />
-                </Card>
-              </Grid>
 
-              {/* Clay Card */}
-              <Grid item xs={12} sm={6}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                  onClick={() => navigate("/product/6809c97f35fbcb19f6cd8246")}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/images/Clay.png"
-                    alt="Clay"
-                    sx={{
-                      width: {xs: 360, sm: 340, md: 680 },
-                      height: { xs: 110, sm: 125, md: 250 },
-                      objectFit: "cover",
-                    }}
-                  />
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
-
-        {/* Second Banner Section */}
+      <Grid container spacing={2} mb={4} justifyContent="center"> {/* Light Purple Section – First Two Cards */} <Grid item xs={12}> <Box sx={{ backgroundColor: "#f4e6f6", padding: 2, borderRadius: 2, }} > <Grid container spacing={2} justifyContent="center"> {[{ img: "/images/Food Grains.png", alt: "Food Grains", link: "/product/6809c6a535fbcb19f6cd8156" }, { img: "/images/Clay.png", alt: "Clay", link: "/product/6809c97f35fbcb19f6cd8246" },].map((item, index) => (<Grid key={index} item xs={12} sm={6} md={4}> <Card sx={{ borderRadius: 3, overflow: "hidden", cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", "&:hover": { transform: "scale(1.02)", boxShadow: "0 8px 24px rgba(0,0,0,0.2)", }, }} onClick={() => navigate(item.link)} > <CardMedia component="img" image={item.img} alt={item.alt} sx={{ width: "100%", height: { xs: 140, sm: 180, md: 220 }, objectFit: "cover", }} /> </Card> </Grid>))} </Grid> </Box> </Grid>
+        {/* Light Gray Section – Remaining Three Cards */}
         <Grid item xs={12}>
           <Box
             sx={{
@@ -108,87 +40,39 @@ const ProductBrowser = () => {
               borderRadius: 2,
             }}
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                  onClick={() => navigate("/product/6809c9e335fbcb19f6cd825e")}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/images/Baby.png"
-                    alt="Baby Care"
+            <Grid container spacing={2} justifyContent="center">
+              {[
+                { img: "/images/Baby.png", alt: "Baby Care", link: "/product/6809c9e335fbcb19f6cd825e" },
+                { img: "/images/Personal.png", alt: "Personal", link: "/product/6809c9fc35fbcb19f6cd8266" },
+                { img: "/images/Dryfruits.png", alt: "Dryfruits", link: "/subcategory/67ff885bee574cb5df2e45c7" },
+              ].map((item, index) => (
+                <Grid key={index} item xs={12} sm={6} md={4}>
+                  <Card
                     sx={{
-                      width: {xs: 360, sm: 227, md: 440 },
-                      height: { xs: 220, sm: 150, md:290},
-                      objectFit: "cover",
+                      borderRadius: 3,
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      transition: "transform 0.3s, box-shadow 0.3s",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+                      },
                     }}
-                  />
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                  onClick={() => navigate("/product/6809c9fc35fbcb19f6cd8266")}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/images/Personal.png"
-                    alt="Personal"
-                    sx={{
-                      width: {xs: 360, sm:280, md: 480 },
-                      height: { xs: 190, sm: 150, md:290 },
-                      objectFit: "cover",
-                    }}
-                  />
-                </Card>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                  onClick={() => navigate("/subcategory/67ff885bee574cb5df2e45c7")}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/images/Dryfruits.png"
-                    alt="Dryfruits"
-                    sx={{
-                      width: {xs: 360, sm: 227, md: 440 },
-                      height: { xs: 190, sm: 150, md:290 },
-                      objectFit: "cover",
-                    }}
-                  />
-                </Card>
-              </Grid>
+                    onClick={() => navigate(item.link)}
+                  >
+                    <CardMedia
+                      component="img"
+                      image={item.img}
+                      alt={item.alt}
+                      sx={{
+                        width: "100%",
+                        height: { xs: 140, sm: 180, md: 220 },
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
           </Box>
         </Grid>
@@ -233,7 +117,7 @@ const ProductBrowser = () => {
                   objectFit: "fill",
                   width: 250,
                   height: 250,
-                  mx:"auto"
+                  mx: "auto"
                 }}
               />
               <CardContent>
