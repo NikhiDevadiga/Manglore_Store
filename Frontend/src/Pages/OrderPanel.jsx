@@ -49,15 +49,31 @@ export default function OrdersPanel() {
       if (filter === 'razorpay') return mode?.includes('razorpay');
       return true;
     })
+    const processedOrders = orders
+    .filter(order => {
+      const mode = order.paymentMode?.toLowerCase();
+      if (filter === 'cod') return mode === 'cash on delivery';
+      if (filter === 'razorpay') return mode?.includes('razorpay');
+      return true;
+    })
     .filter(order => {
       if (!startDate && !endDate) return true;
       const orderDate = new Date(order.createdAt);
-      const from = startDate ? new Date(startDate) : null;
-      const to = endDate ? new Date(endDate) : null;
+
+      let from = startDate ? new Date(startDate) : null;
+      let to = endDate ? new Date(endDate) : null;
+      
+      if (from) {
+        from.setHours(0, 0, 0, 0);
+      }
+      if (to) {
+        to.setHours(23, 59, 59, 999);
+      }
 
       if (from && orderDate < from) return false;
       if (to && orderDate > to) return false;
       return true;
+    })
     })
     .sort((a, b) => {
       if (sort === 'latest') return new Date(b.createdAt) - new Date(a.createdAt);
