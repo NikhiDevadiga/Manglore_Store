@@ -14,7 +14,7 @@ const BreadcrumbsNav = () => {
   useEffect(() => {
     if (categoryId) {
       axios
-        .get(`http://localhost:5000/api/categories/${categoryId}`)
+        .get(`https://manglore-store-t98r.onrender.com/api/categories/${categoryId}`)
         .then((res) => {
           const name = res?.data?.data?.name || "Category";
           setCategoryName(name);
@@ -29,7 +29,7 @@ const BreadcrumbsNav = () => {
   useEffect(() => {
     if (subcategoryId) {
       axios
-        .get(`http://localhost:5000/api/subcategories/${subcategoryId}`)
+        .get(`https://manglore-store-t98r.onrender.com/api/subcategories/${subcategoryId}`)
         .then((res) => {
           const name = res?.data?.data?.name || "Subcategory";
           setSubcategoryName(name);
