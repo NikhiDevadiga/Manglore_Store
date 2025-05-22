@@ -27,7 +27,6 @@ const ProductBrowser = () => {
   }, []);
 
   return (
-
     <Box px={{ xs: 1, sm: 2, md: 4 }} py={2} mb={10}>
       <BreadCrumbs />
       {/* Banner Section */}
@@ -61,7 +60,7 @@ const ProductBrowser = () => {
                     image="/images/Food Grains.png"
                     alt="Food Grains"
                     sx={{
-                      width: {xs: 330, sm: 340, md: 680 },
+                      width: {xs: 360, sm: 340, md: 680 },
                       height: { xs: 110, sm:125, md: 250 },
                       objectFit: "cover",
                     }}
@@ -89,7 +88,7 @@ const ProductBrowser = () => {
                     image="/images/Clay.png"
                     alt="Clay"
                     sx={{
-                      width: {xs: 315, sm: 340, md: 680 },
+                      width: {xs: 360, sm: 340, md: 680 },
                       height: { xs: 110, sm: 125, md: 250 },
                       objectFit: "cover",
                     }}
@@ -99,8 +98,6 @@ const ProductBrowser = () => {
             </Grid>
           </Box>
         </Grid>
-
-
 
         {/* Second Banner Section */}
         <Grid item xs={12}>
@@ -131,8 +128,8 @@ const ProductBrowser = () => {
                     image="/images/Baby.png"
                     alt="Baby Care"
                     sx={{
-                      width: {xs: 315, sm: 227, md: 440 },
-                      height: { xs: 200, sm: 150, md:290},
+                      width: {xs: 360, sm: 227, md: 440 },
+                      height: { xs: 220, sm: 150, md:290},
                       objectFit: "cover",
                     }}
                   />
@@ -158,7 +155,7 @@ const ProductBrowser = () => {
                     image="/images/Personal.png"
                     alt="Personal"
                     sx={{
-                      width: {xs: 315, sm:280, md: 480 },
+                      width: {xs: 360, sm:280, md: 480 },
                       height: { xs: 190, sm: 150, md:290 },
                       objectFit: "cover",
                     }}
@@ -185,7 +182,7 @@ const ProductBrowser = () => {
                     image="/images/Dryfruits.png"
                     alt="Dryfruits"
                     sx={{
-                      width: {xs: 315, sm: 227, md: 440 },
+                      width: {xs: 360, sm: 227, md: 440 },
                       height: { xs: 190, sm: 150, md:290 },
                       objectFit: "cover",
                     }}
@@ -230,7 +227,7 @@ const ProductBrowser = () => {
             >
               <CardMedia
                 component="img"
-                image={`https://manglore-store-t98r.onrender.com/${category.image.replace(/\\/g, "/")}`}
+                image={`http://localhost:5000/${category.image.replace(/\\/g, "/")}`}
                 alt={category.name}
                 sx={{
                   objectFit: "fill",
