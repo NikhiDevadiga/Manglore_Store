@@ -21,7 +21,7 @@ const ProductBrowser = () => {
 
   useEffect(() => {
     axios
-      .get("https://manglore-store-t98r.onrender.com/api/category")
+      .get("http://localhost:5000/api/category")
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error("Category fetch error:", err));
   }, []);
@@ -61,8 +61,8 @@ const ProductBrowser = () => {
                     image="/images/Food Grains.png"
                     alt="Food Grains"
                     sx={{
-                      width: "100%",
-                      height: { xs: 125, sm: 180, md: 250 },
+                      width: {xs: 330, sm: 505, md: 680 },
+                      height: { xs: 110, sm: 180, md: 250 },
                       objectFit: "cover",
                     }}
                   />
@@ -89,8 +89,8 @@ const ProductBrowser = () => {
                     image="/images/Clay.png"
                     alt="Clay"
                     sx={{
-                      width: "100%",
-                      height: { xs: 125, sm: 180, md: 250 },
+                      width: {xs: 315, sm: 498, md: 680 },
+                      height: { xs: 110, sm: 180, md: 250 },
                       objectFit: "cover",
                     }}
                   />
@@ -131,8 +131,8 @@ const ProductBrowser = () => {
                     image="/images/Baby.png"
                     alt="Baby Care"
                     sx={{
-                      width: "100%",
-                      height: { xs: 210, sm: 290 },
+                      width: {xs: 315, sm: 378, md: 440 },
+                      height: { xs: 200, sm: 290},
                       objectFit: "cover",
                     }}
                   />
@@ -158,8 +158,8 @@ const ProductBrowser = () => {
                     image="/images/Personal.png"
                     alt="Personal"
                     sx={{
-                      width: "100%",
-                      height: { xs: 210, sm: 290 },
+                      width: {xs: 315, sm: 398, md: 480 },
+                      height: { xs: 190, sm: 290 },
                       objectFit: "cover",
                     }}
                   />
@@ -185,8 +185,8 @@ const ProductBrowser = () => {
                     image="/images/Dryfruits.png"
                     alt="Dryfruits"
                     sx={{
-                      width: "100%",
-                      height: { xs: 250, sm: 290 },
+                      width: {xs: 315, sm: 378, md: 440 },
+                      height: { xs: 190, sm: 290 },
                       objectFit: "cover",
                     }}
                   />
@@ -230,7 +230,7 @@ const ProductBrowser = () => {
             >
               <CardMedia
                 component="img"
-                image={`https://manglore-store-t98r.onrender.com/${category.image.replace(/\\/g, "/")}`}
+                image={`http://localhost:5000/${category.image.replace(/\\/g, "/")}`}
                 alt={category.name}
                 sx={{
                   objectFit: "fill",
