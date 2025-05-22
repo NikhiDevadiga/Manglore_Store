@@ -78,7 +78,7 @@ const Navbar = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchValue.trim()) {
-        axios.get(`http://localhost:5000/api/product?query=${searchValue}`)
+        axios.get(`https://manglore-store-t98r.onrender.com/api/product?query=${searchValue}`)
           .then(res => setSearchResults(res.data.data))
           .catch(err => console.error("Search API error:", err));
       } else {
@@ -99,7 +99,7 @@ const Navbar = () => {
   const handleProfileUpdate = async () => {
     try {
       setUpdatingProfile(true);
-      await axios.put(`http://localhost:5000/api/update/${user._id}`, editProfileData);
+      await axios.put(`https://manglore-store-t98r.onrender.com/api/update/${user._id}`, editProfileData);
       localStorage.setItem('user', JSON.stringify({ ...user, ...editProfileData }));
       setUserDetails(prev => ({ ...prev, ...editProfileData }));
     } catch (error) {
