@@ -28,7 +28,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
-      : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
+      : `http://localhost:5000/${product.image.replace(/\\/g, "/")}`;
 
     const exists = cartItems.find((item) => item._id === product._id);
 
@@ -44,7 +44,13 @@ export const CartProvider = ({ children }) => {
     } else {
       setCartItems((prev) => [
         ...prev,
-        { ...product, image: formattedImage, quantity: 1 },
+        {
+          ...product,
+          image: formattedImage,
+          quantity: 1,
+          weight: product.weight || 1,   //  ensures weight is never undefined
+          unit: product.unit || "unit"   //  set valid default (like "g", "kg", etc.)
+        }
       ]);
       toast.success('Added to cart', { toastId: `add-${product._id}` });
     }
