@@ -129,7 +129,7 @@ const AdminLogin = () => {
             <p>Password: <strong>admin123</strong></p>
         </div> */}
 
-          {/* <Typography mt={3} textAlign="center" fontSize="14px">
+          <Typography mt={3} textAlign="center" fontSize="14px">
             Are you a user?{" "}
             <Link
               component="button"
@@ -138,7 +138,7 @@ const AdminLogin = () => {
             >
               Login
             </Link>
-          </Typography> */}
+          </Typography>
         </Paper>
       </Container>
     </Box>
