@@ -66,7 +66,6 @@ export default function OrdersPanel() {
       if (to && orderDate > to) return false;
       return true;
     })
-    })
     .sort((a, b) => {
       if (sort === 'latest') return new Date(b.createdAt) - new Date(a.createdAt);
       if (sort === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
