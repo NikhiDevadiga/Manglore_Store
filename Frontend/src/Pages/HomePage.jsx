@@ -61,8 +61,8 @@ const ProductBrowser = () => {
                     image="/images/Food Grains.png"
                     alt="Food Grains"
                     sx={{
-                      width: {xs: 330, sm: 505, md: 680 },
-                      height: { xs: 110, sm: 180, md: 250 },
+                      width: {xs: 330, sm: 340, md: 680 },
+                      height: { xs: 110, sm:125, md: 250 },
                       objectFit: "cover",
                     }}
                   />
@@ -89,8 +89,8 @@ const ProductBrowser = () => {
                     image="/images/Clay.png"
                     alt="Clay"
                     sx={{
-                      width: {xs: 315, sm: 498, md: 680 },
-                      height: { xs: 110, sm: 180, md: 250 },
+                      width: {xs: 315, sm: 340, md: 680 },
+                      height: { xs: 110, sm: 125, md: 250 },
                       objectFit: "cover",
                     }}
                   />
@@ -131,8 +131,8 @@ const ProductBrowser = () => {
                     image="/images/Baby.png"
                     alt="Baby Care"
                     sx={{
-                      width: {xs: 315, sm: 378, md: 440 },
-                      height: { xs: 200, sm: 290},
+                      width: {xs: 315, sm: 227, md: 440 },
+                      height: { xs: 200, sm: 150, md:290},
                       objectFit: "cover",
                     }}
                   />
@@ -158,8 +158,8 @@ const ProductBrowser = () => {
                     image="/images/Personal.png"
                     alt="Personal"
                     sx={{
-                      width: {xs: 315, sm: 398, md: 480 },
-                      height: { xs: 190, sm: 290 },
+                      width: {xs: 315, sm:280, md: 480 },
+                      height: { xs: 190, sm: 150, md:290 },
                       objectFit: "cover",
                     }}
                   />
@@ -185,8 +185,8 @@ const ProductBrowser = () => {
                     image="/images/Dryfruits.png"
                     alt="Dryfruits"
                     sx={{
-                      width: {xs: 315, sm: 378, md: 440 },
-                      height: { xs: 190, sm: 290 },
+                      width: {xs: 315, sm: 227, md: 440 },
+                      height: { xs: 190, sm: 150, md:290 },
                       objectFit: "cover",
                     }}
                   />
