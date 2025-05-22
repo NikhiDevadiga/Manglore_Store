@@ -27,7 +27,7 @@ const ProfileDrawer = ({
 
   const fetchUserDetails = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users/list");
+      const res = await axios.get("https://manglore-store-t98r.onrender.com/api/users/list");
       const matchedUser = res.data.data.find(u => u.email === user?.email);
       setUserDetails(matchedUser);
       setEditProfileData({
@@ -43,7 +43,7 @@ const ProfileDrawer = ({
   const fetchOrders = async () => {
     try {
       setLoadingOrders(true);
-      const res = await axios.get(`http://localhost:5000/api/user/${user._id}`);
+      const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/user/${user._id}`);
       setOrders(res.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
