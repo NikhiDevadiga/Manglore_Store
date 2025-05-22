@@ -28,7 +28,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
-      : `http://localhost:5000/${product.image.replace(/\\/g, "/")}`;
+      : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
 
     const exists = cartItems.find((item) => item._id === product._id);
 
