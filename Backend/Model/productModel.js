@@ -31,7 +31,7 @@ const productSchema =new mongoose.Schema({
         type : String,
         required : true
     },
-    quantity: {
+    weight: {
         type: Number,
         required: true,
     },
@@ -40,9 +40,13 @@ const productSchema =new mongoose.Schema({
         enum: ['kg', 'g', 'liter', 'ml', 'unit'],
         required: true
     },
-    stock: {
+    stockquantity: {
         type: Number,
-        default: 10,
+        required: true
+    },
+    stockunit: {
+        type: String,
+        enum: ['kg', 'g', 'liter', 'ml', 'unit'],
         required: true
     }
 },{
