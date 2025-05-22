@@ -137,7 +137,7 @@ const Product = () => {
                   <Typography variant="h6" fontWeight="bold" align="center">
                     {product.name}
                     <Box component="span" fontSize="0.75rem" ml={1} color="text.secondary">
-                      ({product.weight}{product.unit})
+                      {product.weight}{product.unit}
                     </Box>
                   </Typography>
 
