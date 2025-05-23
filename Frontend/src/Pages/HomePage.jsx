@@ -24,7 +24,7 @@ const ProductBrowser = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/category")
+      .get("https://manglore-store-t98r.onrender.com/api/category")
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error("Category fetch error:", err));
   }, []);
@@ -124,7 +124,7 @@ const ProductBrowser = () => {
             >
               <CardMedia
                 component="img"
-                image={`http://localhost:5000/${category.image.replace(/\\/g, "/")}`}
+                image={`https://manglore-store-t98r.onrender.com/${category.image.replace(/\\/g, "/")}`}
                 alt={category.name}
                 sx={{
                   objectFit: "fill",
