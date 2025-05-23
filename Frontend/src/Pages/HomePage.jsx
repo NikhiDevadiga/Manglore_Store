@@ -24,7 +24,7 @@ const ProductBrowser = () => {
 
   useEffect(() => {
     axios
-      .get("https://manglore-store-t98r.onrender.com/api/category")
+      .get("http://localhost:5000/api/category")
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error("Category fetch error:", err));
   }, []);
@@ -46,34 +46,23 @@ const ProductBrowser = () => {
     slidesToShow: 3,
     slidesToScroll: 1,
     responsive: [
-      { breakpoint: 1200, settings: { slidesToShow: 2 } },
-      { breakpoint: 768, settings: { slidesToShow: 1 } },
+      { breakpoint: 1200, settings: { slidesToShow: 2 } },// below 1200px (laptop/tablet)
+      { breakpoint: 768, settings: { slidesToShow: 1 } }, // below 768px (mobile)
     ],
   };
 
   return (
-    <Box px={{ xs: 1, sm: 2, md: 4 }} py={2} mb={10}>
+    <Box px={{ xs: 1, sm: 2, md: 3 }} py={2} mb={10}>
       <BreadCrumbs />
 
       <Box sx={{ backgroundColor: "#e2c1f555", p: 4, borderRadius: 1, mb: 3 }}>
         <Slider {...sliderSettings}>
           {allItems.map((item, index) => (
-            <Box key={index} px={0.5}>
+            <Box key={index} px={{ xs: 0.5, sm: 1, lg:10 }}>
               <Card
                 sx={{
-                  width: {
-                    xs: 300,     // mobile full width
-                    sm: 320,        // small screen (tablets)
-                    md: 360,        // medium screens
-                    lg: 420,        // large screens
-                  },
-                  height: {
-                    xs: 175,
-                    sm: 187,
-                    md: 211,
-                    lg: 247,
-                  },
-                  borderRadius: 3,
+                  width:"97%",
+                  height:"100%",
                   overflow: "hidden",
                   cursor: "pointer",
                   mx: "auto",
@@ -91,8 +80,8 @@ const ProductBrowser = () => {
                   alt={item.alt}
                   sx={{
                     width: "100%",
-                    height: "auto", // Let image scale naturally
-                    objectFit: "contain", // Maintain original aspect ratio
+                    height: "100%", // Let image scale naturally
+                    objectFit: "fill", // Maintain original aspect ratio
                     display: "block",
                   }}
                 />
@@ -135,7 +124,7 @@ const ProductBrowser = () => {
             >
               <CardMedia
                 component="img"
-                image={`https://manglore-store-t98r.onrender.com/${category.image.replace(/\\/g, "/")}`}
+                image={`http://localhost:5000/${category.image.replace(/\\/g, "/")}`}
                 alt={category.name}
                 sx={{
                   objectFit: "fill",
