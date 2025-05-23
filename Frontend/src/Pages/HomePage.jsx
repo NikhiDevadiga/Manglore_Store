@@ -12,6 +12,9 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const ProductBrowser = () => {
   const [categories, setCategories] = useState([]);
@@ -21,62 +24,83 @@ const ProductBrowser = () => {
 
   useEffect(() => {
     axios
-      .get("https://manglore-store-t98r.onrender.com/api/category")
+      .get("http://localhost:5000/api/category")
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error("Category fetch error:", err));
   }, []);
 
-   return (
+  const allItems = [
+    { img: "/images/Food Grains.png", alt: "Food Grains", link: "/product/6809c6a535fbcb19f6cd8156" },
+    { img: "/images/Clay.png", alt: "Clay", link: "/product/6809c97f35fbcb19f6cd8246" },
+    { img: "/images/Baby.png", alt: "Baby Care", link: "/product/6809c9e335fbcb19f6cd825e" },
+    { img: "/images/Personal.png", alt: "Personal", link: "/product/6809c9fc35fbcb19f6cd8266" },
+    { img: "/images/Dryfruits.png", alt: "Dryfruits", link: "/subcategory/67ff885bee574cb5df2e45c7" },
+  ];
+
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    autoplay: true,
+    autoplaySpeed: 2000, // 2 seconds
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 1200, settings: { slidesToShow: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
+    ],
+  };
+
+  return (
     <Box px={{ xs: 1, sm: 2, md: 4 }} py={2} mb={10}>
       <BreadCrumbs />
 
-      <Grid container spacing={2} mb={4} justifyContent="center"> {/* Light Purple Section – First Two Cards */} <Grid item xs={12}> <Box sx={{ backgroundColor: "#f4e6f6", padding: 2, borderRadius: 2, }} > <Grid container spacing={2} justifyContent="center"> {[{ img: "/images/Food Grains.png", alt: "Food Grains", link: "/product/6809c6a535fbcb19f6cd8156" }, { img: "/images/Clay.png", alt: "Clay", link: "/product/6809c97f35fbcb19f6cd8246" },].map((item, index) => (<Grid key={index} item xs={12} sm={6} md={4}> <Card sx={{ borderRadius: 3, overflow: "hidden", cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", "&:hover": { transform: "scale(1.02)", boxShadow: "0 8px 24px rgba(0,0,0,0.2)", }, }} onClick={() => navigate(item.link)} > <CardMedia component="img" image={item.img} alt={item.alt} sx={{ width: "100%", height: { xs: 140, sm: 180, md: 220 }, objectFit: "cover", }} /> </Card> </Grid>))} </Grid> </Box> </Grid>
-        {/* Light Gray Section – Remaining Three Cards */}
-        <Grid item xs={12}>
-          <Box
-            sx={{
-              backgroundColor: "#f5f5f5",
-              padding: 2,
-              borderRadius: 2,
-            }}
-          >
-            <Grid container spacing={2} justifyContent="center">
-              {[
-                { img: "/images/Baby.png", alt: "Baby Care", link: "/product/6809c9e335fbcb19f6cd825e" },
-                { img: "/images/Personal.png", alt: "Personal", link: "/product/6809c9fc35fbcb19f6cd8266" },
-                { img: "/images/Dryfruits.png", alt: "Dryfruits", link: "/subcategory/67ff885bee574cb5df2e45c7" },
-              ].map((item, index) => (
-                <Grid key={index} item xs={12} sm={6} md={4}>
-                  <Card
-                    sx={{
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      cursor: "pointer",
-                      transition: "transform 0.3s, box-shadow 0.3s",
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                      },
-                    }}
-                    onClick={() => navigate(item.link)}
-                  >
-                    <CardMedia
-                      component="img"
-                      image={item.img}
-                      alt={item.alt}
-                      sx={{
-                        width: "100%",
-                        height: { xs: 140, sm: 180, md: 220 },
-                        objectFit: "cover",
-                      }}
-                    />
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Grid>
-      </Grid>
+      <Box sx={{ backgroundColor: "#e2c1f555", p: 4, borderRadius: 1, mb: 3 }}>
+        <Slider {...sliderSettings}>
+          {allItems.map((item, index) => (
+            <Box key={index} px={0.5}>
+              <Card
+                sx={{
+                  width: {
+                    xs: 300,     // mobile full width
+                    sm: 320,        // small screen (tablets)
+                    md: 360,        // medium screens
+                    lg: 420,        // large screens
+                  },
+                  height: {
+                    xs: 175,
+                    sm: 187,
+                    md: 211,
+                    lg: 247,
+                  },
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  mx: "auto",
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+                  },
+                }}
+                onClick={() => navigate(item.link)}
+              >
+                <CardMedia
+                  component="img"
+                  image={item.img}
+                  alt={item.alt}
+                  sx={{
+                    width: "100%",
+                    height: "auto", // Let image scale naturally
+                    objectFit: "contain", // Maintain original aspect ratio
+                    display: "block",
+                  }}
+                />
+              </Card>
+            </Box>
+          ))}
+        </Slider>
+      </Box>
 
       <Typography
         variant={isMobile ? "h6" : "h5"}
@@ -111,7 +135,7 @@ const ProductBrowser = () => {
             >
               <CardMedia
                 component="img"
-                image={`https://manglore-store-t98r.onrender.com/${category.image.replace(/\\/g, "/")}`}
+                image={`http://localhost:5000/${category.image.replace(/\\/g, "/")}`}
                 alt={category.name}
                 sx={{
                   objectFit: "fill",
