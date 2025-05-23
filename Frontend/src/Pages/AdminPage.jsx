@@ -10,7 +10,8 @@ import { useNavigate } from "react-router-dom";
 import OrdersPanel from "./OrderPanel";
 
 const gstOptions = Array.from({ length: 19 }, (_, i) => i);
-const API_BASE = "https://manglore-store-t98r.onrender.com/api";
+// const offerOptions = Array.from({ length: 100 }, (_, i) => i);
+const API_BASE = "http://localhost:5000/api";
 
 const AdminPage = () => {
   const [activeMainTab, setActiveMainTab] = useState("itemDetails"); // New
@@ -30,7 +31,7 @@ const AdminPage = () => {
   const [forms, setForms] = useState({
     category: { name: "", image: null },
     subcategory: { name: "", cat_id: "", image: null },
-    product: { name: "", price: "", gst: "", weight: "", unit: "", description: "", cat_id: "", subcat_id: "", stockquantity: "", stockunit: "", image: null },
+    product: { name: "", price: "", gst: "", weight: "", unit: "", description: "", cat_id: "", subcat_id: "", stockquantity: "", stockunit: "", offerpercentage: "", validTill: "", image: null },
   });
 
   const [searchTerm, setSearchTerm] = useState(""); // New for search
@@ -114,7 +115,8 @@ const AdminPage = () => {
       subcat_id: item.subcat_id?._id || item.subcat_id || "",
       stockquantity: item.stockquantity || "",
       stockunit: item.stockunit || "",
-
+      offerpercentage: item.offer?.offerpercentage || "",
+      validTill: item.offer?.validTill ? item.offer.validTill.split("T")[0] : "", // format for input[type=date]
     });
   };
 
@@ -210,6 +212,8 @@ const AdminPage = () => {
                 <MenuItem value="unit">unit</MenuItem>
               </Select>
             </FormControl>
+            <TextField fullWidth name="offerpercentage" label="Offer Percentage" value={form.offerpercentage || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
+            <TextField fullWidth name="validTill" label="Offer Valid Till" type="date" value={form.validTill} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} InputLabelProps={{ shrink: true }} />
           </>
         )}
         {["subcategory", "product"].includes(activeSection) && (
@@ -248,7 +252,7 @@ const AdminPage = () => {
           <TableHead>
             <TableRow>
               {["Image", "Name", ...(activeSection === "subcategory" ? ["Category"] : []),
-                ...(activeSection === "product" ? ["Price", "Quantity", "Unit", "Gst", "Description", "Category", "Subcategory", "Available Stock", "Stock Unit"] : []), "Actions"]
+                ...(activeSection === "product" ? ["Price", "Quantity", "Unit", "Gst", "Description", "Category", "Subcategory", "Available Stock", "Stock Unit", "Offer Percentage", "Offer Valid Till"] : []), "Actions"]
                 .map((h, i) => <TableCell key={i} sx={{ fontWeight: "bold", color: "#02002ee0" }}>{h}</TableCell>)}
             </TableRow>
           </TableHead>
@@ -411,6 +415,18 @@ const AdminPage = () => {
                         </FormControl>
                       ) : (
                         item.stockunit
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editItem === item._id ? (
+                        <TextField fullWidth name="offerpercentage" value={editFields.offerpercentage} onChange={(e) => setEditFields({ ...editFields, offerpercentage: e.target.value })} sx={{ mb: 1 }} />
+                      ) : item.offer?.offerpercentage}
+                    </TableCell>
+                    <TableCell>
+                      {editItem === item._id ? (
+                        <TextField fullWidth name="validTill" type="date" value={editFields.validTill} onChange={(e) => setEditFields({ ...editFields, validTill: e.target.value })} sx={{ mb: 1 }} InputLabelProps={{ shrink: true }} />
+                      ) : (
+                        item.offer?.validTill ? new Date(item.offer.validTill).toLocaleDateString() : "-"
                       )}
                     </TableCell>
                   </>
