@@ -48,6 +48,10 @@ const productSchema =new mongoose.Schema({
         type: String,
         enum: ['kg', 'g', 'liter', 'ml', 'unit'],
         required: true
+    },
+    offer: {
+        offerpercentage: { type: Number, required: false },
+        validTill: { type: Date, default: null }
     }
 },{
     timestamps : true //createdAt, updatedAt
