@@ -1,5 +1,5 @@
 import express from "express";
-import { createSubCat, getSubCat, getSubCatBy_Id, deleteSubCat, updateSubCat } from "../Controller/subcategoryController.js";
+import { createSubCat, getSubCat, getSubCatBy_Id, deleteSubCat,getSubCategoryById, updateSubCat } from "../Controller/subcategoryController.js";
 import upload from "../middleware/upload.js"
 
 const router = express.Router();
@@ -9,5 +9,6 @@ router.get("/subcategory", getSubCat);
 router.get("/:cat_id", getSubCatBy_Id);
 router.put("/subcategory/:id",upload.single('image'), updateSubCat);
 router.delete("/subcategory/:id",deleteSubCat);
+router.get("/subcategories/:id", getSubCategoryById);
 
 export default router;
