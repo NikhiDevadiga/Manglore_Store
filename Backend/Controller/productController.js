@@ -18,6 +18,11 @@ export const createProduct = async (req, res) => {
           unit: req.body.unit, // New field for unit of measurement
           stockquantity: req.body.stockquantity,
           stockunit:req.body.stockunit,
+           offer: {
+            offerpercentage: req.body.offerpercentage,
+            validTill: req.body.validTill || null
+          }
+          
         });
         await products.save();
         res.status(201).json({success:true, data:products });
@@ -41,7 +46,7 @@ export const getProducts = async (req, res) => {
     const products = await Product.find(filter)
       .populate('cat_id', 'name') // Populate category name
       .populate('subcat_id', 'name') // Populate subcategory name
-      .select('name image price gst description cat_id subcat_id weight unit stockquantity stockunit'); // Select relevant fields
+      .select('name image price gst description cat_id subcat_id weight unit stockquantity stockunit offer'); // Select relevant fields
     res.status(200).json({ success: true, data: products });
   } catch (error) {
     console.error("Error in fetching products:", error.message);  // Log the error message for debugging
@@ -53,7 +58,7 @@ export const getProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).select("name image price gst description cat_id subcat_id weight unit stockquantity stockunit");
+    const product = await Product.findById(id).select("name image price gst description cat_id subcat_id weight unit stockquantity stockunit offer");
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found." });
@@ -70,7 +75,7 @@ export const getProductById = async (req, res) => {
 export const getProductBy_Id = async (req, res) => {
   try {
     const { subcat_id } = req.params;
-    const product = await Product.find({ subcat_id }).select("name image price gst description cat_id subcat_id weight unit stockquantity stockunit");
+    const product = await Product.find({ subcat_id }).select("name image price gst description cat_id subcat_id weight unit stockquantity stockunit offer");
 
     if (product.length === 0) {
       return res.status(404).json({ success: false, message: "No Product found." });
@@ -103,6 +108,13 @@ export const updateProduct = async (req, res) => {
       if (req.body.stockquantity) existingProduct.stockquantity = req.body.stockquantity;
       if(req.body.stockunit) existingProduct.stockunit = req.body.stockunit;
       if (req.file) existingProduct.image = req.file.path;
+      if (req.body.offerpercentage !== undefined || req.body.validTill !== undefined) {
+        existingProduct.offer = {
+          offerpercentage: req.body.offerpercentage || 0,
+          validTill: req.body.validTill || null
+        };
+      }
+
       await existingProduct.save();
       res.status(200).json({ success: true, data: existingProduct });
     } catch (error) {
@@ -110,7 +122,6 @@ export const updateProduct = async (req, res) => {
       res.status(500).json({ success: false, message: "Server Error" });
     }
   };
-
 
 export const deleteProduct = async(req,res) => {
     const {id} = req.params;
