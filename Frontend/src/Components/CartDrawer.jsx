@@ -68,7 +68,7 @@ export default function CartDrawer({ open, onClose }) {
 
     const fetchAddresses = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/address/${user._id}`);
+        const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/address/${user._id}`);
         setSavedAddresses(res.data); // Adjust this if your API returns a nested structure
       } catch (err) {
         console.error("Failed to fetch saved addresses:", err.response ? err.response.data : err.message);
@@ -138,7 +138,7 @@ export default function CartDrawer({ open, onClose }) {
     const user = JSON.parse(localStorage.getItem('user'));
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/address/${user._id}`,
+        `https://manglore-store-t98r.onrender.com/api/address/${user._id}`,
         address,
         {
           headers: {
@@ -211,7 +211,7 @@ export default function CartDrawer({ open, onClose }) {
 
       try {
         console.log("Cart Items: ", cartItems);
-        const response = await axios.post('http://localhost:5000/api/admin/createOrders', order);
+        const response = await axios.post('https://manglore-store-t98r.onrender.com/api/admin/createOrders', order);
       } catch (err) {
         console.error("Error saving order:", err.response?.data || err.message);
         setDialogMessage("Failed to place order. Please try again.");
