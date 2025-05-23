@@ -11,7 +11,7 @@ import OrdersPanel from "./OrderPanel";
 
 const gstOptions = Array.from({ length: 19 }, (_, i) => i);
 // const offerOptions = Array.from({ length: 100 }, (_, i) => i);
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://manglore-store-t98r.onrender.com/api";
 
 const AdminPage = () => {
   const [activeMainTab, setActiveMainTab] = useState("itemDetails"); // New
