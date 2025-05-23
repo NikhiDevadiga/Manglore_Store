@@ -25,12 +25,20 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(storageKey, JSON.stringify(cartItems));
   }, [cartItems, storageKey]);
 
+  const getDiscountedPrice = (price, offer) => {
+    if (!offer || !offer.offerpercentage) return price;
+    const discount = (price * offer.offerpercentage) / 100;
+    return parseFloat((price - discount).toFixed(2));
+  };
+
+
   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
-      : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
+      : `http://localhost:5000/${product.image.replace(/\\/g, "/")}`;
 
     const exists = cartItems.find((item) => item._id === product._id);
+    const discountedPrice = getDiscountedPrice(Number(product.price), product.offer);
 
     if (exists) {
       setCartItems((prev) =>
@@ -49,7 +57,8 @@ export const CartProvider = ({ children }) => {
           image: formattedImage,
           quantity: 1,
           weight: product.weight || 1,   //  ensures weight is never undefined
-          unit: product.unit || "unit"   //  set valid default (like "g", "kg", etc.)
+          unit: product.unit || "unit",  //  set valid default (like "g", "kg", etc.)
+          discountedPrice,
         }
       ]);
       toast.success('Added to cart', { toastId: `add-${product._id}` });
