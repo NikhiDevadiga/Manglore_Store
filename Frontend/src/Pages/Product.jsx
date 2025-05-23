@@ -28,18 +28,18 @@ const Product = () => {
     const wishlistedIds = wishlist.map((item) => item._id);
     setWishlistedProducts(wishlistedIds);
   }, [wishlist]);
-  
+
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
         if (isSingleProductPage && id) {
-          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/by-id/${id}`);
+          const res = await axios.get(`http://localhost:5000/api/product/by-id/${id}`);
           const product = res.data?.data || res.data;
           setProducts(product && product._id ? [product] : []);
         } else if (subcategoryId) {
-          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`);
+          const res = await axios.get(`http://localhost:5000/api/product/${subcategoryId}`);
           const data = res.data.data;
           setProducts(Array.isArray(data) ? data : [data]);
         }
@@ -74,8 +74,14 @@ const Product = () => {
     toast.success("Product added to Cart");
   };
 
+  const calculateDiscountedPrice = (price, offer) => {
+    if (!offer || !offer.offerpercentage) return price;
+    const discount = (price * offer.offerpercentage) / 100;
+    return (price - discount).toFixed(2);
+  };
+
   const formatImagePath = (path) =>
-    `https://manglore-store-t98r.onrender.com/${path?.replace(/\\/g, "/")}`;
+    `http://localhost:5000/${path?.replace(/\\/g, "/")}`;
 
   return (
     <Box p={2} mb={10}>
@@ -141,12 +147,61 @@ const Product = () => {
                     </Box>
                   </Typography>
 
-                  <Typography variant="subtitle1" color="text.primary" fontWeight="bold" align="center">
-                    ₹{product.price}
+                  {product.offer?.offerpercentage > 0 && (
+                    <Box
+                      sx={{
+                        backgroundColor: "#e53935",
+                        color: "#fff",
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 1,
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        width: "fit-content",
+                        mx: "auto",
+                        mt: 0.5,
+                        mb: 1,
+                      }}
+                    >
+                      {product.offer.offerpercentage}% OFF
+                    </Box>
+                  )}
+
+                  <Typography
+                    variant="subtitle1"
+                    align="center"
+                    fontWeight="bold"
+                    color="text.primary"
+                  >
+                    ₹{calculateDiscountedPrice(Number(product.price), product.offer)}
+                    {product.offer?.offerpercentage > 0 && (
+                      <Box
+                        component="span"
+                        fontSize="0.75rem"
+                        ml={1}
+                        sx={{ textDecoration: "line-through", color: "gray" }}
+                      >
+                        ₹{product.price}
+                      </Box>
+                    )}
                     <Box component="span" fontSize="0.75rem" ml={0.5}>
                       + {product.gst}% GST
                     </Box>
                   </Typography>
+
+                  {product.offer?.validTill && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      align="center"
+                      display="block"
+                      mt={0.5}
+                    >
+                      Valid Till: {new Date(product.offer.validTill).toLocaleDateString()}
+                    </Typography>
+                  )}
+
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -206,6 +261,7 @@ const Product = () => {
                     </Button>
                   </Stack>
                 </CardContent>
+
               </Card>
             </Grid>
           ))}
