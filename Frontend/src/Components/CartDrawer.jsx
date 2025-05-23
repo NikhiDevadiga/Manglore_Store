@@ -32,17 +32,17 @@ export default function CartDrawer({ open, onClose }) {
 
   const finalTotal = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-      const price = parseFloat(item?.price) || 0;
+      const price = parseFloat(item?.discountedPrice ?? item?.price) || 0;
       const quantity = parseInt(item?.quantity) || 0;
       const itemTotal = price * quantity;
       return sum + itemTotal;
     }, 0)
     : 0;
 
-  // Calculate total GST amount
+  // Calculate total GST amount based on discounted price
   const totalGST = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-      const price = parseFloat(item?.price) || 0;
+      const price = parseFloat(item?.discountedPrice ?? item?.price) || 0;
       const quantity = parseInt(item?.quantity) || 0;
       const gst = parseFloat(item?.gst) || 0;
       const itemTotal = price * quantity;
@@ -68,7 +68,7 @@ export default function CartDrawer({ open, onClose }) {
 
     const fetchAddresses = async () => {
       try {
-        const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/address/${user._id}`);
+        const res = await axios.get(`http://localhost:5000/api/address/${user._id}`);
         setSavedAddresses(res.data); // Adjust this if your API returns a nested structure
       } catch (err) {
         console.error("Failed to fetch saved addresses:", err.response ? err.response.data : err.message);
@@ -84,8 +84,6 @@ export default function CartDrawer({ open, onClose }) {
       );
     }
   }, []);
-
-
 
   const handleTogglePayment = () => setPaymentOpen(prev => !prev);
   const handleToggleAddresses = () => setAddressesOpen(prev => !prev);
@@ -140,7 +138,7 @@ export default function CartDrawer({ open, onClose }) {
     const user = JSON.parse(localStorage.getItem('user'));
     try {
       const response = await axios.post(
-        `https://manglore-store-t98r.onrender.com/api/address/${user._id}`,
+        `http://localhost:5000/api/address/${user._id}`,
         address,
         {
           headers: {
@@ -213,7 +211,7 @@ export default function CartDrawer({ open, onClose }) {
 
       try {
         console.log("Cart Items: ", cartItems);
-        const response = await axios.post('https://manglore-store-t98r.onrender.com/api/admin/createOrders', order);
+        const response = await axios.post('http://localhost:5000/api/admin/createOrders', order);
       } catch (err) {
         console.error("Error saving order:", err.response?.data || err.message);
         setDialogMessage("Failed to place order. Please try again.");
@@ -227,7 +225,7 @@ export default function CartDrawer({ open, onClose }) {
     if (paymentMode === 'Cash on Delivery') {
       setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal.toFixed(2)}`);
       setDialogOpen(true);
-      await saveOrderToBackend({cartItems, user, address, paymentMode, finalTotal, location});
+      await saveOrderToBackend({ cartItems, user, address, paymentMode, finalTotal, location });
       await saveAddressToBackend();
       clearCart();
       setTimeout(() => onClose(), 2000);
@@ -246,7 +244,7 @@ export default function CartDrawer({ open, onClose }) {
         description: 'Order Payment',
         image: 'https://your-logo-url.com/logo.png',
         handler: function (response) {
-          saveOrderToBackend({ paymentId: response.razorpay_payment_id,cartItems, user, address, paymentMode, finalTotal, location});
+          saveOrderToBackend({ paymentId: response.razorpay_payment_id, cartItems, user, address, paymentMode, finalTotal, location });
           setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal.toFixed(2)}`);
           setDialogOpen(true);
           saveAddressToBackend();
@@ -302,7 +300,7 @@ export default function CartDrawer({ open, onClose }) {
                     }
                   />
                   <Box sx={{ textAlign: 'right' }}>
-                    <Typography fontWeight="bold">₹ {item.price * item.quantity}</Typography>
+                    <Typography fontWeight="bold">₹ {((item.discountedPrice ?? item.price) * item.quantity).toFixed(2)}</Typography>
                     <Button size="small" color="error" onClick={() => removeFromCart(item._id)} sx={{ mt: 1 }}>
                       Remove
                     </Button>
