@@ -193,7 +193,7 @@ export default function CartDrawer({ open, onClose }) {
           _id: item._id,
           name: item.name || 'Unnamed Item',
           price: Number(item.price) || 0,
-          weight: ((item.weight || 1) * (item.quantity || 1)).toFixed(2), // safer weight calc
+          weight: Number(item.weight || 1), // safer weight calc
           quantity: Number(item.quantity) || 1,
           unit: item.unit || '',
         })),
