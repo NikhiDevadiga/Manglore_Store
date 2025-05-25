@@ -35,6 +35,7 @@ const AdminPage = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState(""); // New for search
+  const today = new Date().toISOString().split("T")[0];//for today date
 
   const fetchData = async () => {
     try {
@@ -213,7 +214,7 @@ const AdminPage = () => {
               </Select>
             </FormControl>
             <TextField fullWidth name="offerpercentage" label="Offer Percentage" value={form.offerpercentage || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
-            <TextField fullWidth name="validTill" label="Offer Valid Till" type="date" value={form.validTill} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} InputLabelProps={{ shrink: true }} />
+            <TextField fullWidth name="validTill" label="Offer Valid Till" type="date" value={form.validTill} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} InputLabelProps={{ shrink: true }} inputProps={{ min: today }} />
           </>
         )}
         {["subcategory", "product"].includes(activeSection) && (
@@ -424,7 +425,7 @@ const AdminPage = () => {
                     </TableCell>
                     <TableCell>
                       {editItem === item._id ? (
-                        <TextField fullWidth name="validTill" type="date" value={editFields.validTill} onChange={(e) => setEditFields({ ...editFields, validTill: e.target.value })} sx={{ mb: 1 }} InputLabelProps={{ shrink: true }} />
+                        <TextField fullWidth name="validTill" type="date" value={editFields.validTill} onChange={(e) => setEditFields({ ...editFields, validTill: e.target.value })} sx={{ mb: 1 }} InputLabelProps={{ shrink: true }} inputProps={{ min: today }} />
                       ) : (
                         item.offer?.validTill ? new Date(item.offer.validTill).toLocaleDateString() : "-"
                       )}
