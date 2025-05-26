@@ -19,14 +19,15 @@ const productSchema =new mongoose.Schema({
         type : String,
         required : true
     },
-    price:{
-        type : String,
-        required : true
-    },
-    gst:{
-        type : String,
-        required : true
-    },
+        price: {
+        type: Number, // was String
+        required: true
+        },
+        gst: {
+        type: Number, // was String
+        required: true
+        },
+
     description:{
         type : String,
         required : true
@@ -37,7 +38,7 @@ const productSchema =new mongoose.Schema({
     },
     unit: {
         type: String,
-        enum: ['kg', 'g', 'liter', 'ml', 'unit'],
+        enum: ['Kg', 'Gm', 'Liter', 'Ml', 'Unit'],
         required: true
     },
     stockquantity: {
@@ -46,13 +47,15 @@ const productSchema =new mongoose.Schema({
     },
     stockunit: {
         type: String,
-        enum: ['kg', 'g', 'liter', 'ml', 'unit'],
+        enum: ['Kg', 'Gm', 'Liter', 'Ml', 'Unit'],
         required: true
     },
     offer: {
         offerpercentage: { type: Number, required: false },
         validTill: { type: Date, default: null }
     }
+
+
 },{
     timestamps : true //createdAt, updatedAt
 });
