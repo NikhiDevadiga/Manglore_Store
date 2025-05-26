@@ -7,7 +7,7 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user")); // Get the logged-in user
   const userId = user?._id;
-  const storageKey = userId ? cart_${userId} : "guest_cart"; // Unique key per user or guest
+  const storageKey = userId ? `cart_${userId}` : "guest_cart"; // Unique key per user or guest
 
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem(storageKey);
