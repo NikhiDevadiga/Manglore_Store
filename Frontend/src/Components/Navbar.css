@@ -19,11 +19,12 @@
 }
 
 .navbar-logo {
-  color: var(--primary-color);
+  color: #9c44ce;
   font-size: 1.6rem;
   font-weight: bold;
   flex-shrink: 0;
-  color: #9c44ce;
+  margin-left: 20px;
+  margin-right: 15px;
 }
 
 .location-btn {
@@ -41,29 +42,35 @@
   color: #ffffff;
 }
 
-.search-bar,
-.search-bar-mobile {
-  width: 87%;
-  max-width: 900px;
+/* Responsive Search Bar */
+.search-bar {
+  width: 100%;
+  padding: 6px 0;
+  margin: 10px auto;
+  display: flex;
+  justify-content: center;
   position: relative;
 }
 
 .search-input {
   width: 100%;
-  padding: 3px 12px;
+  max-width: 100%;
+  padding: 6px 12px;
   font-size: 14px;
   border: 1px solid var(--input-border);
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
-.search-input input::placeholder {
+.search-input::placeholder {
   color: #aaa;
   opacity: 1;
 }
 
+/* Search results dropdown */
 .search-results {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
   color: #000000;
@@ -115,8 +122,40 @@
   margin-right: 10px;
 }
 
-/* Tablet styles */
-@media (max-width: 768px) {
+/* Small screen (Mobile) */
+@media (max-width: 550px) {
+  .navbar-container {
+    gap: 10px;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .navbar-logo {
+    font-size: 1.1rem;
+  }
+
+  .search-bar {
+    width: 100%;
+    padding: 0;
+    margin: 0 10px;
+  }
+
+  .search-input {
+    font-size: 14px;
+  }
+
+  .mobile-menu-icon {
+    display: block;
+  }
+
+  .location-btn,
+  .navbar-icons {
+    display: none;
+  }
+}
+
+/* Medium screen (Tablet) */
+@media (min-width: 551px) and (max-width: 1023px) {
   .navbar-container {
     padding: 12px;
   }
@@ -131,8 +170,13 @@
   }
 
   .search-bar {
-    max-width: 100%;
-    margin-top: 10px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .search-input {
+    font-size: 15px;
   }
 
   .navbar-icons {
@@ -140,35 +184,20 @@
   }
 }
 
-/* Mobile styles */
-@media (max-width: 550px) {
-  .navbar-container {
-    gap: 10px;
-    justify-content: flex-start;
+/* Large screen (Desktop) */
+@media (min-width: 1024px) {
+  .search-bar {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
   }
 
-  .navbar-logo {
-    font-size: 1.1rem;
-  }
-
-  .search-bar,
-  .location-btn,
-  .navbar-icons {
-    display: none;
-  }
-
-  .mobile-menu-icon {
-    display: block;
-  }
-
-  .search-bar-mobile {
-    display: block;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-bottom: 1px solid #e0e0e0;
+  .search-input {
+    font-size: 16px;
   }
 }
 
+/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
