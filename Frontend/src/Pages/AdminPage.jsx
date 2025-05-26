@@ -145,7 +145,8 @@ const AdminPage = () => {
       alert("Deleted!");
       fetchData();
     } catch (err) {
-      alert("Error deleting.");
+      const msg = err?.response?.data?.message || "Error deleting.";
+      alert(msg); // ⬅Show exact backend message
     }
   };
 
