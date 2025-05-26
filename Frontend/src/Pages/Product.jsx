@@ -83,6 +83,23 @@ const Product = () => {
   const formatImagePath = (path) =>
     `https://manglore-store-t98r.onrender.com/${path?.replace(/\\/g, "/")}`;
 
+  const isLowStock = (quantity, unit) => {
+    if (!quantity || !unit) return false;
+
+    switch (unit) {
+      case "kg":
+      case "liter":
+        return quantity <= 5;
+      case "g":
+      case "ml":
+        return quantity <= 5000;
+      case "unit":
+        return quantity <= 50;
+      default:
+        return false;
+    }
+  };
+  
   return (
     <Box p={2} mb={10}>
       <BreadCrumbs />
@@ -112,6 +129,7 @@ const Product = () => {
                 sx={{
                   width: 250,
                   cursor: "pointer",
+                  border: isLowStock(product.stockquantity, product.stockunit) ? "2px solid red" : "none",
                   "&:hover": {
                     boxShadow: "0px 4px 20px #02002ee0",
                   },
@@ -120,6 +138,26 @@ const Product = () => {
                   flexDirection: "column",
                 }}
               >
+                {
+                  isLowStock(product.stockquantity, product.stockunit) && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        left: 8,
+                        backgroundColor: 'red',
+                        color: 'white',
+                        px: 1,
+                        py: 0.5,
+                        fontSize: '0.75rem',
+                        borderRadius: 1,
+                        zIndex: 1,
+                      }}
+                    >
+                      Low Stock
+                    </Box>
+                  )
+                }
                 <CardMedia
                   component="img"
                   image={formatImagePath(product.image)}
