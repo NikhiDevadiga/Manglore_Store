@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import OrdersPanel from "./OrderPanel";
 
 const gstOptions = Array.from({ length: 19 }, (_, i) => i);
-// const offerOptions = Array.from({ length: 100 }, (_, i) => i);
 const API_BASE = "https://manglore-store-t98r.onrender.com/api";
 
 const AdminPage = () => {
@@ -34,8 +33,8 @@ const AdminPage = () => {
     product: { name: "", price: "", gst: "", weight: "", unit: "", description: "", cat_id: "", subcat_id: "", stockquantity: "", stockunit: "", offerpercentage: "", validTill: "", image: null },
   });
 
-  const [searchTerm, setSearchTerm] = useState(""); // New for search
   const today = new Date().toISOString().split("T")[0];//for today date
+  const [searchTerm, setSearchTerm] = useState(""); // New for search
 
   const fetchData = async () => {
     try {
@@ -150,6 +149,7 @@ const AdminPage = () => {
     }
   };
 
+
   const handleUserQueryDelete = async (id) => {
     try {
       await axios.delete(`${API_BASE}/admin/messages/${id}`);
@@ -188,11 +188,11 @@ const AdminPage = () => {
                 label="Unit"
                 onChange={(e) => handleFormChange(e, activeSection)}
               >
-                <MenuItem value="kg">kg</MenuItem>
-                <MenuItem value="g">g</MenuItem>
-                <MenuItem value="liter">liter</MenuItem>
-                <MenuItem value="ml">ml</MenuItem>
-                <MenuItem value="unit">unit</MenuItem>
+                <MenuItem value="Kg">Kg</MenuItem>
+                <MenuItem value="Gm">Gm</MenuItem>
+                <MenuItem value="Liter">Liter</MenuItem>
+                <MenuItem value="Ml">Ml</MenuItem>
+                <MenuItem value="Unit">Unit</MenuItem>
               </Select>
             </FormControl>
             <TextField fullWidth select name="gst" label="GST" value={form.gst || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }}>{gstOptions.map((value) => (<MenuItem key={value} value={value}>{value}%</MenuItem>))}</TextField>
@@ -207,11 +207,11 @@ const AdminPage = () => {
                 label="Stock-Unit"
                 onChange={(e) => handleFormChange(e, activeSection)}
               >
-                <MenuItem value="kg">kg</MenuItem>
-                <MenuItem value="g">g</MenuItem>
-                <MenuItem value="liter">liter</MenuItem>
-                <MenuItem value="ml">ml</MenuItem>
-                <MenuItem value="unit">unit</MenuItem>
+                <MenuItem value="Kg">Kg</MenuItem>
+                <MenuItem value="Gm">Gm</MenuItem>
+                <MenuItem value="Liter">Liter</MenuItem>
+                <MenuItem value="Ml">Ml</MenuItem>
+                <MenuItem value="Unit">Unit</MenuItem>
               </Select>
             </FormControl>
             <TextField fullWidth name="offerpercentage" label="Offer Percentage" value={form.offerpercentage || ""} onChange={(e) => handleFormChange(e, activeSection)} sx={{ mb: 2 }} />
@@ -320,11 +320,11 @@ const AdminPage = () => {
                             value={editFields.unit}
                             onChange={(e) => setEditFields({ ...editFields, unit: e.target.value })}
                           >
-                            <MenuItem value="kg">kg</MenuItem>
-                            <MenuItem value="g">g</MenuItem>
-                            <MenuItem value="liter">liter</MenuItem>
-                            <MenuItem value="ml">ml</MenuItem>
-                            <MenuItem value="unit">unit</MenuItem>
+                            <MenuItem value="Kg">Kg</MenuItem>
+                            <MenuItem value="Gm">Gm</MenuItem>
+                            <MenuItem value="Liter">Liter</MenuItem>
+                            <MenuItem value="Ml">Ml</MenuItem>
+                            <MenuItem value="Unit">Unit</MenuItem>
                           </Select>
                         </FormControl>
                       ) : (
@@ -408,11 +408,11 @@ const AdminPage = () => {
                             value={editFields.stockunit}
                             onChange={(e) => setEditFields({ ...editFields, stockunit: e.target.value })}
                           >
-                            <MenuItem value="kg">kg</MenuItem>
-                            <MenuItem value="g">g</MenuItem>
-                            <MenuItem value="liter">liter</MenuItem>
-                            <MenuItem value="ml">ml</MenuItem>
-                            <MenuItem value="unit">unit</MenuItem>
+                            <MenuItem value="Kg">Kg</MenuItem>
+                            <MenuItem value="Gm">Gm</MenuItem>
+                            <MenuItem value="Liter">Liter</MenuItem>
+                            <MenuItem value="Ml">Ml</MenuItem>
+                            <MenuItem value="Unit">Unit</MenuItem>
                           </Select>
                         </FormControl>
                       ) : (
@@ -651,3 +651,4 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
+
