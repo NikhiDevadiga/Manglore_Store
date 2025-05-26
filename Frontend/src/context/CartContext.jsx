@@ -43,7 +43,7 @@ export const CartProvider = ({ children }) => {
       const totalWeight = (exists.quantity + 1) * (product.weight || 1);
       if (totalWeight > product.stockquantity) {
         toast.error(Not enough stock. Only ${product.stockquantity} ${product.unit || "units"} available., {
-          toastId: not-enough-stock-${product._id}
+          toastId: `not-enough-stock-${product._id}`
         });
         return;
       }
