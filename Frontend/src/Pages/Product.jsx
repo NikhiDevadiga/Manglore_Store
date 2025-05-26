@@ -81,7 +81,7 @@ const Product = () => {
   };
 
   const formatImagePath = (path) =>
-    `http://localhost:5000/${path?.replace(/\\/g, "/")}`;
+    `https://manglore-store-t98r.onrender.com/${path?.replace(/\\/g, "/")}`;
 
   const isLowStock = (quantity, unit) => {
     if (!quantity || !unit) return false;
