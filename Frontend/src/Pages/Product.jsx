@@ -35,11 +35,11 @@ const Product = () => {
       setLoading(true);
       try {
         if (isSingleProductPage && id) {
-          const res = await axios.get(`http://localhost:5000/api/product/by-id/${id}`);
+          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/by-id/${id}`);
           const product = res.data?.data || res.data;
           setProducts(product && product._id ? [product] : []);
         } else if (subcategoryId) {
-          const res = await axios.get(`http://localhost:5000/api/product/${subcategoryId}`);
+          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`);
           const data = res.data.data;
           setProducts(Array.isArray(data) ? data : [data]);
         }
@@ -81,7 +81,7 @@ const Product = () => {
   };
 
   const formatImagePath = (path) =>
-    `http://localhost:5000/${path?.replace(/\\/g, "/")}`;
+    `https://manglore-store-t98r.onrender.com/${path?.replace(/\\/g, "/")}`;
 
   const isLowStock = (quantity, unit) => {
     if (!quantity || !unit) return false;
