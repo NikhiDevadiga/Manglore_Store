@@ -31,16 +31,21 @@ export const CartProvider = ({ children }) => {
     return parseFloat((price - discount).toFixed(2));
   };
 
-
-  const addToCart = (product) => {
+   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
       : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
 
     const exists = cartItems.find((item) => item._id === product._id);
-    const discountedPrice = getDiscountedPrice(Number(product.price), product.offer);
 
     if (exists) {
+      // Check if total weight with new quantity would exceed stock
+      const totalWeight = (exists.quantity + 1) * (product.weight || 1);
+      if (totalWeight > product.stockquantity) {
+        toast.error('Cannot add more. Stock limit reached.', { toastId: `stock - limit - ${product._id}` });
+        return;
+      }
+
       setCartItems((prev) =>
         prev.map((item) =>
           item._id === product._id
@@ -48,37 +53,50 @@ export const CartProvider = ({ children }) => {
             : item
         )
       );
-      toast.info('Quantity updated in cart', { toastId: `update-${product._id}` });
+      toast.info('Quantity updated in cart', { toastId: `update - ${product._id}` });
     } else {
+      if (product.stockquantity < (product.weight || 1)) {
+        toast.error('Out of stock', { toastId: `out - of - stock - ${product._id}` });
+        return;
+      }
+
       setCartItems((prev) => [
         ...prev,
         {
           ...product,
           image: formattedImage,
           quantity: 1,
-          weight: product.weight || 1,   //  ensures weight is never undefined
-          unit: product.unit || "unit",  //  set valid default (like "g", "kg", etc.)
-          discountedPrice,
+          weight: product.weight || 1,
+          unit: product.unit || "Unit"
         }
       ]);
-      toast.success('Added to cart', { toastId: `add-${product._id}` });
+      toast.success('Added to cart', { toastId: `add - ${product._id}` });
     }
   };
 
   const changeQuantity = (id, newQty) => {
+    const item = cartItems.find((item) => item._id === id);
+    if (!item) return;
+
+    const totalWeight = newQty * (item.weight || 1);
+
     if (newQty < 1) {
       setCartItems((prev) => prev.filter((item) => item._id !== id));
-      toast.warn('Removed from cart', { toastId: `remove-${id}` });
+      toast.warn('Removed from cart', { toastId: `remove - ${id}` });
+    } else if (totalWeight > item.stockquantity) {
+      toast.error(`Cannot set quantity more than stock(${item.stockquantity} ${item.unit})`, {
+        toastId: `exceed - stock - ${id}`
+      });
     } else {
       setCartItems((prev) =>
         prev.map((item) =>
           item._id === id ? { ...item, quantity: newQty } : item
         )
       );
-      toast.info('Cart quantity changed', { toastId: `change-${id}` });
+      toast.info('Cart quantity changed', { toastId: `change - ${id}` });
     }
   };
-
+  
   const removeFromCart = (id) => {
     setCartItems((prev) => prev.filter((item) => item._id !== id));
     toast.warn('Removed from cart', { toastId: `remove-${id}` });
