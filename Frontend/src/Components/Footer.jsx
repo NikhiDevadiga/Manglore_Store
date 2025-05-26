@@ -50,8 +50,8 @@ const Footer = () => {
         <div className="footer-right">
           <h4>Get In Touch</h4>
           <p><FaMapMarkerAlt className="footer-icon" /> 123 Mangalore, Dakshina-Kannada, Udupi Dist</p>
-          <p><FaPhoneAlt className="footer-icon" /> <a href="tel:+919876543210" className="footer-phone">+91-9876543210</a></p>
-          <p><FaEnvelope className="footer-icon" /> <a href="mailto:mangalorestore@gmail.com" className="footer-email">mangalorestore@gmail.com</a></p>
+          <p><FaPhoneAlt className="footer-icon" /> <a href="tel:+919876543210" className="footer-phone">+919167055930</a></p>
+          <p><FaEnvelope className="footer-icon" /> <a href="mailto:mangalorestore@gmail.com" className="footer-email">qineossoftware@gmail.com</a></p>
         </div>
       </div>
     </footer>
