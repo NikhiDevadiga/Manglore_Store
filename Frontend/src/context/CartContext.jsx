@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("user")); // Get the logged-in user
+  const user = JSON.parse(localStorage.getItem("user")); // Get logged-in user
   const userId = user?._id;
-  const storageKey = userId ? `cart_${userId}` : "guest_cart"; // Unique key per user or guest
+  const storageKey = userId ? `cart_${userId}` : "guest_cart"; // Unique per user or guest
 
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Update cart on user change (e.g., login/logout)
+  // Update cart on user change (e.g. login/logout)
   useEffect(() => {
     const stored = localStorage.getItem(storageKey);
     setCartItems(stored ? JSON.parse(stored) : []);
@@ -25,13 +25,7 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(storageKey, JSON.stringify(cartItems));
   }, [cartItems, storageKey]);
 
-  const getDiscountedPrice = (price, offer) => {
-    if (!offer || !offer.offerpercentage) return price;
-    const discount = (price * offer.offerpercentage) / 100;
-    return parseFloat((price - discount).toFixed(2));
-  };
-
-   const addToCart = (product) => {
+  const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
       : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
@@ -42,21 +36,22 @@ export const CartProvider = ({ children }) => {
       // Check if total weight with new quantity would exceed stock
       const totalWeight = (exists.quantity + 1) * (product.weight || 1);
       if (totalWeight > product.stockquantity) {
-        toast.error('Cannot add more. Stock limit reached.', { toastId: `stock - limit - ${product._id}` });
+        toast.error(
+          `Not enough stock. Only ${product.stockquantity} ${product.unit || "units"} available.`,
+          { toastId: `not-enough-stock-${product._id}` }
+        );
         return;
       }
 
       setCartItems((prev) =>
         prev.map((item) =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
         )
       );
-      toast.info('Quantity updated in cart', { toastId: `update - ${product._id}` });
+      toast.info("Quantity updated in cart", { toastId: `update-${product._id}` });
     } else {
       if (product.stockquantity < (product.weight || 1)) {
-        toast.error('Out of stock', { toastId: `out - of - stock - ${product._id}` });
+        toast.error("Out of stock", { toastId: `out-of-stock-${product._id}` });
         return;
       }
 
@@ -67,10 +62,10 @@ export const CartProvider = ({ children }) => {
           image: formattedImage,
           quantity: 1,
           weight: product.weight || 1,
-          unit: product.unit || "Unit"
-        }
+          unit: product.unit || "Unit",
+        },
       ]);
-      toast.success('Added to cart', { toastId: `add - ${product._id}` });
+      toast.success("Added to cart", { toastId: `add-${product._id}` });
     }
   };
 
@@ -82,40 +77,33 @@ export const CartProvider = ({ children }) => {
 
     if (newQty < 1) {
       setCartItems((prev) => prev.filter((item) => item._id !== id));
-      toast.warn('Removed from cart', { toastId: `remove - ${id}` });
+      toast.warn("Removed from cart", { toastId: `remove-${id}` });
     } else if (totalWeight > item.stockquantity) {
-      toast.error(`Cannot set quantity more than stock(${item.stockquantity} ${item.unit})`, {
-        toastId: `exceed - stock - ${id}`
-      });
+      toast.error(
+        `Cannot set quantity more than stock (${item.stockquantity} ${item.unit})`,
+        { toastId: `exceed-stock-${id}` }
+      );
     } else {
       setCartItems((prev) =>
-        prev.map((item) =>
-          item._id === id ? { ...item, quantity: newQty } : item
-        )
+        prev.map((item) => (item._id === id ? { ...item, quantity: newQty } : item))
       );
-      toast.info('Cart quantity changed', { toastId: `change - ${id}` });
+      toast.info("Cart quantity changed", { toastId: `change-${id}` });
     }
   };
-  
+
   const removeFromCart = (id) => {
     setCartItems((prev) => prev.filter((item) => item._id !== id));
-    toast.warn('Removed from cart', { toastId: `remove-${id}` });
+    toast.warn("Removed from cart", { toastId: `remove-${id}` });
   };
 
   const clearCart = () => {
     setCartItems([]);
-    toast.error('Cart cleared', { toastId: 'clear-cart' });
+    toast.error("Cart cleared", { toastId: "clear-cart" });
   };
 
   return (
     <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        changeQuantity,
-        removeFromCart,
-        clearCart
-      }}
+      value={{ cartItems, addToCart, changeQuantity, removeFromCart, clearCart }}
     >
       {children}
     </CartContext.Provider>
