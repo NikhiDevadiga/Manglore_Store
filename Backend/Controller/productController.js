@@ -123,16 +123,31 @@ export const updateProduct = async (req, res) => {
     }
   };
 
-export const deleteProduct = async(req,res) => {
-    const {id} = req.params;
-   if(!mongoose.Types.ObjectId.isValid(id)){
-    return res.status(404).json({success:false, message: "Invalid Product id"})
+export const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  // Step 1: Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "Invalid Product ID" });
+  }
+  try {
+    // Step 2: Find the product
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
-   try{
+    // Step 3: Check stock quantity
+    if (product.stockquantity <= 0) {
     await Product.findByIdAndDelete(id);
-    res.status(200).json({success:true, message:"Product Deleted"});
-   }catch(error){
-    console.error("Error in delete product:", error.message);
-        res.status(500).json({success:false, message: "Server Error"});
-   }
+    return res.status(200).json({ success: true, message: "Product deleted" });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: "Cannot delete product. Stock quantity is greater than 0."
+    });
+  }
+  } catch (error) {
+    console.error("Error in deleteProduct:", error.message);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
