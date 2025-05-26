@@ -81,19 +81,19 @@ const Product = () => {
   };
 
   const formatImagePath = (path) =>
-    `https://manglore-store-t98r.onrender.com/${path?.replace(/\\/g, "/")}`;
+    `http://localhost:5000/${path?.replace(/\\/g, "/")}`;
 
   const isLowStock = (quantity, unit) => {
     if (!quantity || !unit) return false;
 
     switch (unit) {
-      case "kg":
-      case "liter":
+      case "Kg":
+      case "Liter":
         return quantity <= 5;
-      case "g":
-      case "ml":
+      case "Gm":
+      case "Ml":
         return quantity <= 5000;
-      case "unit":
+      case "Unit":
         return quantity <= 50;
       default:
         return false;
@@ -311,3 +311,5 @@ const Product = () => {
 };
 
 export default Product;
+
+
