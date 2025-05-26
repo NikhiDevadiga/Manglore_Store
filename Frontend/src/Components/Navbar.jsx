@@ -12,10 +12,13 @@ import axios from 'axios';
 import './Navbar.css';
 import CartDrawer from './CartDrawer';
 import ProfileDrawer from './ProfileDrawer';
+import { useWishlist } from '../context/Wishlist'
 
 const Navbar = () => {
   const { cartItems = [] } = useCart();
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const { wishlist } = useWishlist();
+  const wishlistCount = wishlist.length;
   const navigate = useNavigate();
   const isTablet = useMediaQuery('(max-width:768px)');
   const isMobile = useMediaQuery('(max-width:550px)');
@@ -149,7 +152,7 @@ const Navbar = () => {
         {!isTablet && (
           <>
             <Tooltip title={location} arrow>
-              <Button startIcon={<MdMyLocation />} variant="outlined" sx={{color:"#9d66bd", borderColor:"#9d66bd"}} onClick={() => setOpenDialog(true)} className="location-btn">
+              <Button startIcon={<MdMyLocation />} variant="outlined" sx={{ color: "#9d66bd", borderColor: "#9d66bd" }} onClick={() => setOpenDialog(true)} className="location-btn">
                 <Box className="location-text">{location}</Box>
               </Button>
             </Tooltip>
@@ -169,7 +172,15 @@ const Navbar = () => {
             </Box>
 
             <Box className="navbar-icons">
-              <div onClick={() => handleIconClick('wishlist')} aria-label="wishlist"><FaHeart size={20} /></div>
+              <div onClick={() => handleIconClick('wishlist')} aria-label="wishlist">
+                <Badge
+                  variant="dot"
+                  color="secondary"
+                  invisible={wishlistCount === 0}
+                >
+                  <FaHeart size={20} />
+                </Badge>
+              </div>
               {user && (
                 <div onClick={() => handleIconClick('cart')} aria-label="cart">
                   <Badge badgeContent={totalItems > 0 ? totalItems : null} color="secondary">
@@ -199,7 +210,7 @@ const Navbar = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Select a location for delivery</DialogTitle>
         <DialogContent>
-          <Button onClick={handleDetectLocation} fullWidth variant="contained" sx={{backgroundColor: "#02002ee0",color: "#fff"}} startIcon={<MdMyLocation />}>
+          <Button onClick={handleDetectLocation} fullWidth variant="contained" sx={{ backgroundColor: "#02002ee0", color: "#fff" }} startIcon={<MdMyLocation />}>
             Detect My Location
           </Button>
         </DialogContent>
@@ -224,29 +235,29 @@ const Navbar = () => {
       <CartDrawer open={openCartDrawer} onClose={() => setOpenCartDrawer(false)} />
 
       <Drawer anchor="left" open={openMobileDrawer} onClose={() => setOpenMobileDrawer(false)}>
-         <Box role="presentation" sx={{ width: 260, p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-             <Typography variant="h6" fontWeight="bold">Menu</Typography>
-             <IconButton onClick={() => setOpenMobileDrawer(false)}>
+        <Box role="presentation" sx={{ width: 260, p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" fontWeight="bold">Menu</Typography>
+            <IconButton onClick={() => setOpenMobileDrawer(false)}>
               <span style={{ fontSize: 12 }}>×</span>
-             </IconButton>
-           </Box>
-           <Box sx={{ display: 'flex', flexDirection: 'column', mt: 2 }}>
-             <Button onClick={() => handleIconClick('wishlist')} variant="text" sx={{ justifyContent: 'flex-start', color:'#02002ee0',  }}>
+            </IconButton>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', mt: 2 }}>
+            <Button onClick={() => handleIconClick('wishlist')} variant="text" sx={{ justifyContent: 'flex-start', color: '#02002ee0', }}>
               Wishlist
             </Button>
-            <Button onClick={() => handleIconClick('cart')} variant="text" sx={{ justifyContent: 'flex-start', color:'#02002ee0' }}>
-               Cart
-             </Button>
-             <Button onClick={() => handleIconClick('profile')} variant="text" sx={{ justifyContent: 'flex-start', color:'#02002ee0' }}>
-               User Profile
-             </Button>
-             <Button onClick={() => setOpenDialog(true)} variant="text" sx={{ justifyContent: 'flex-start', color:'#02002ee0'}}>
-               your Location
-             </Button>
-           </Box>
-         </Box>
-       </Drawer>
+            <Button onClick={() => handleIconClick('cart')} variant="text" sx={{ justifyContent: 'flex-start', color: '#02002ee0' }}>
+              Cart
+            </Button>
+            <Button onClick={() => handleIconClick('profile')} variant="text" sx={{ justifyContent: 'flex-start', color: '#02002ee0' }}>
+              User Profile
+            </Button>
+            <Button onClick={() => setOpenDialog(true)} variant="text" sx={{ justifyContent: 'flex-start', color: '#02002ee0' }}>
+              your Location
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </>
   );
 };
