@@ -14,6 +14,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 // Razorpay loader function
 const loadRazorpayScript = () => {
@@ -32,19 +33,17 @@ export default function CartDrawer({ open, onClose }) {
 
   const finalTotal = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-      const price = parseFloat(item?.price) || 0;
+      const price = parseFloat(item?.discountedPrice ?? item?.price) || 0;
       const quantity = parseInt(item?.quantity) || 0;
       const itemTotal = price * quantity;
       return sum + itemTotal;
     }, 0)
     : 0;
 
-  // Calculate total GST amount
+  // Calculate total GST amount based on discounted price
   const totalGST = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-      const price =
-
-        (item?.price) || 0;
+      const price = parseFloat(item?.discountedPrice ?? item?.price) || 0;
       const quantity = parseInt(item?.quantity) || 0;
       const gst = parseFloat(item?.gst) || 0;
       const itemTotal = price * quantity;
@@ -86,8 +85,6 @@ export default function CartDrawer({ open, onClose }) {
       );
     }
   }, []);
-
-
 
   const handleTogglePayment = () => setPaymentOpen(prev => !prev);
   const handleToggleAddresses = () => setAddressesOpen(prev => !prev);
@@ -186,22 +183,19 @@ export default function CartDrawer({ open, onClose }) {
     }
 
     const saveOrderToBackend = async ({ cartItems, user, address, paymentMode, finalTotal, location, extra = {} }) => {
-      // ✅ Step 1: Validation
       for (const item of cartItems) {
         if (item.weight === undefined || item.unit === undefined) {
-          toast.error(`Missing weight or unit for "${item.name}". Please check your cart.`);
+          toast.error(`Missing weight or unit for "${item.name}".Please check your cart.`);
           throw new Error("Missing weight/unit in cart items.");
         }
       }
       const order = {
-        
         items: cartItems.map(item => ({
-          _id: item._id, 
+          _id: item._id,
           name: item.name || 'Unnamed Item',
-          price: Number(item.price )|| 0,
-          // weight: ((item.weight || 1) * (item.quantity || 1)).toFixed(2), // safer weight calc
-          weight: Number(item.weight) || 1, // ✅ raw unit weight only
-          quantity:Number(item.quantity) || 1,
+          price: Number(item.price) || 0,
+          weight: Number(item.weight || 1), // safer weight calc
+          quantity: Number(item.quantity) || 1,
           unit: item.unit || '',
         })),
         total: finalTotal,
@@ -230,13 +224,12 @@ export default function CartDrawer({ open, onClose }) {
 
 
     if (paymentMode === 'Cash on Delivery') {
-      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal}`);
+      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal.toFixed(2)}`);
       setDialogOpen(true);
       await saveOrderToBackend({ cartItems, user, address, paymentMode, finalTotal, location });
-
       await saveAddressToBackend();
       clearCart();
-      setTimeout(() => onClose(), 4000);
+      setTimeout(() => onClose(), 2000);
     } else if (paymentMode === 'Razorpay') {
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
@@ -252,22 +245,12 @@ export default function CartDrawer({ open, onClose }) {
         description: 'Order Payment',
         image: 'https://your-logo-url.com/logo.png',
         handler: function (response) {
-          // saveOrderToBackend({ paymentId: response.razorpay_payment_id });
-          saveOrderToBackend({
-            cartItems,
-            user,
-            address,
-            paymentMode,
-            finalTotal,
-            location,
-            extra: { paymentId: response.razorpay_payment_id }
-          });
-
-          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal}`);
+          saveOrderToBackend({ paymentId: response.razorpay_payment_id, cartItems, user, address, paymentMode, finalTotal, location });
+          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal.toFixed(2)}`);
           setDialogOpen(true);
           saveAddressToBackend();
           clearCart();
-          setTimeout(() => onClose(), 3500);
+          setTimeout(() => onClose(), 2000);
         },
         prefill: {
           name: user?.name || '',
@@ -318,7 +301,7 @@ export default function CartDrawer({ open, onClose }) {
                     }
                   />
                   <Box sx={{ textAlign: 'right' }}>
-                    <Typography fontWeight="bold">₹ {item.price * item.quantity}</Typography>
+                    <Typography fontWeight="bold">₹ {((item.discountedPrice ?? item.price) * item.quantity).toFixed(2)}</Typography>
                     <Button size="small" color="error" onClick={() => removeFromCart(item._id)} sx={{ mt: 1 }}>
                       Remove
                     </Button>
@@ -500,4 +483,4 @@ export default function CartDrawer({ open, onClose }) {
       </Dialog>
     </Drawer>
   );
-}     
+}
