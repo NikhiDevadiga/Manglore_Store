@@ -63,7 +63,7 @@ const ProfileDrawer = ({
     doc.text('Mangalore Store', 20, 20);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Mangalore, Dakshina-Kannada, Udupi Dist, Karnataka - 575001', 20, 26);
+    doc.text('Mangalore, Dakshina-Kannada Dist, Karnataka - 575001', 20, 26);
     // doc.text('GSTIN: 29ABCDE1234F1Z5', 20, 32); // Optional GSTIN
 
     // ======= Invoice Title =======
