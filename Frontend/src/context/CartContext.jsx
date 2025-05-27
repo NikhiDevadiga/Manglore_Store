@@ -5,33 +5,36 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("user")); // Get the logged-in user
+  const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?._id;
-  const storageKey = userId ? `cart_${userId}` : "guest_cart"; // Unique key per user or guest
+  const storageKey = userId ? `cart_${userId}` : "guest_cart";
 
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Update cart on user change (e.g., login/logout)
   useEffect(() => {
     const stored = localStorage.getItem(storageKey);
     setCartItems(stored ? JSON.parse(stored) : []);
   }, [storageKey]);
 
-  // Persist cart to localStorage on change
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(cartItems));
   }, [cartItems, storageKey]);
 
-  const getDiscountedPrice = (price, offer) => {
-    if (!offer || !offer.offerpercentage) return price;
-    const discount = (price * offer.offerpercentage) / 100;
-    return parseFloat((price - discount).toFixed(2));
+  // --- Unit conversion helpers ---
+  const unitToBase = {
+    Kg: 1000,
+    Gm: 1,
+    mg: 0.001,
+    Liter: 1000,
+    Ml: 1,
   };
 
-
+  const convertToBaseUnit = (quantity, unit) => {
+    return unitToBase[unit] ? quantity * unitToBase[unit] : quantity;
+  };
 
   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
@@ -41,10 +44,13 @@ export const CartProvider = ({ children }) => {
     const exists = cartItems.find((item) => item._id === product._id);
 
     if (exists) {
-      // Check if total weight with new quantity would exceed stock
-      const totalWeight = (exists.quantity + 1) * (product.weight || 1);
-      if (totalWeight > product.stockquantity) {
-        toast.error('Cannot add more. Stock limit reached.', { toastId: `stock - limit - ${product._id}` });
+      const stockBase = convertToBaseUnit(exists.stockquantity, exists.stockunit);
+      const requestedBase = convertToBaseUnit(exists.weight, exists.unit) * (exists.quantity + 1);
+
+      if (requestedBase > stockBase) {
+        toast.error(`Not enough stock for ${exists.name}`, {
+          toastId: `stock-${exists._id}`,
+        });
         return;
       }
 
@@ -55,48 +61,47 @@ export const CartProvider = ({ children }) => {
             : item
         )
       );
-      toast.info('Quantity updated in cart', { toastId: `update - ${product._id}` });
+      toast.info('Quantity updated in cart', { toastId: `update-${product._id}` });
     } else {
-      if (product.stockquantity < (product.weight || 1)) {
-        toast.error('Out of stock', { toastId: `out - of - stock - ${product._id}` });
-        return;
-      }
-
       setCartItems((prev) => [
         ...prev,
         {
           ...product,
           image: formattedImage,
           quantity: 1,
-          weight: product.weight || 1,
-          unit: product.unit || "Unit"
-        }
+          stockquantity: product.stockquantity,
+          stockunit: product.stockunit,
+        },
       ]);
-      toast.success('Added to cart', { toastId: `add - ${product._id}` });
+      toast.success('Added to cart', { toastId: `add-${product._id}` });
     }
   };
 
   const changeQuantity = (id, newQty) => {
-    const item = cartItems.find((item) => item._id === id);
-    if (!item) return;
+    setCartItems((prev) =>
+      prev.map((item) => {
+        if (item._id === id) {
+          if (newQty < 1) {
+            toast.warn('Removed from cart', { toastId: `remove-${id}` });
+            return null; // Remove item
+          }
 
-    const totalWeight = newQty * (item.weight || 1);
+          const stockBase = convertToBaseUnit(item.stockquantity, item.stockunit);
+          const requestedBase = convertToBaseUnit(item.weight, item.unit) * newQty;
 
-    if (newQty < 1) {
-      setCartItems((prev) => prev.filter((item) => item._id !== id));
-      toast.warn('Removed from cart', { toastId: `remove - ${id}` });
-    } else if (totalWeight > item.stockquantity) {
-      toast.error(`Cannot set quantity more than stock(${item.stockquantity} ${item.unit})`, {
-        toastId: `exceed - stock - ${id}`
-      });
-    } else {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item._id === id ? { ...item, quantity: newQty } : item
-        )
-      );
-      toast.info('Cart quantity changed', { toastId: `change - ${id}` });
-    }
+          if (requestedBase > stockBase) {
+            toast.error(`Not enough stock for ${item.name}`, {
+              toastId: `stock-${id}`,
+            });
+            return item; // No change
+          }
+
+          toast.info('Cart quantity changed', { toastId: `change-${id}` });
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      }).filter(Boolean)
+    );
   };
 
   const removeFromCart = (id) => {
@@ -116,10 +121,14 @@ export const CartProvider = ({ children }) => {
         addToCart,
         changeQuantity,
         removeFromCart,
-        clearCart
+        clearCart,
+        convertToBaseUnit, // Optional: if needed in UI to disable buttons
+        unitToBase,         // Optional: if needed in UI
       }}
     >
       {children}
     </CartContext.Provider>
   );
 };
+
+
