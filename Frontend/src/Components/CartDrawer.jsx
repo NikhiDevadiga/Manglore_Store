@@ -252,6 +252,13 @@ export default function CartDrawer({ open, onClose }) {
     }
   };
 
+  const calculateDiscountedPrice = (price, offer) => {
+    if (offer?.offerpercentage > 0) {
+      return Math.round(price - (price * offer.offerpercentage) / 100);
+    }
+    return Math.round(price);
+  };
+  
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: 360, p: 3, display: 'flex', flexDirection: 'column', height: '100%', color:"#ddd", backgroundColor:"#02002ee0" }}>
@@ -288,11 +295,28 @@ export default function CartDrawer({ open, onClose }) {
             }
           />
           <Box sx={{ textAlign: 'right' }}>
-            <Typography fontWeight="bold">₹ {item.price * item.quantity}</Typography>
-            <Button size="small" color="error" onClick={() => removeFromCart(item._id)} sx={{ mt: 1 }}>
-              Remove
-            </Button>
-          </Box>
+                    <Typography fontWeight="bold" fontSize="1rem" color="secondary">
+                      ₹{calculateDiscountedPrice(Number(item.price), item.offer) * item.quantity}
+                    </Typography>
+
+                    {item.offer?.offerpercentage > 0 && (
+                      <Typography
+                        fontSize="0.75rem"
+                        sx={{ textDecoration: "line-through", color: "gray" }}
+                      >
+                        ₹{Number(item.price) * item.quantity}
+                      </Typography>
+                    )}
+
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => removeFromCart(item._id)}
+                      sx={{ mt: 1 }}
+                    >
+                      Remove
+                    </Button>
+                  </Box>
         </ListItem>
       ))}
     </List>
