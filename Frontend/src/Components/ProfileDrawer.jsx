@@ -7,6 +7,8 @@ import { ExpandMore } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import SavedAddresses from './SavedAddresses';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const ProfileDrawer = ({
   open, onClose, user, userDetails, setUserDetails,
@@ -50,6 +52,137 @@ const ProfileDrawer = ({
     } finally {
       setLoadingOrders(false);
     }
+  };
+
+  const generateInvoice = (order) => {
+    const doc = new jsPDF();
+
+    // ======= Store Header =======
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Mangalore Store', 20, 20);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Mangalore, Dakshina-Kannada, Udupi Dist, Karnataka - 575001', 20, 26);
+    // doc.text('GSTIN: 29ABCDE1234F1Z5', 20, 32); // Optional GSTIN
+
+    // ======= Invoice Title =======
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TAX INVOICE / BILL OF SUPPLY', 105, 45, { align: 'center' });
+
+    // ======= Invoice Details =======
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Invoice No: ${order._id || order.id}`, 20, 55);
+    doc.text(`Order No: ${order._id || order.id}`, 20, 61);
+    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 20, 67);
+
+    doc.text(`Place of Supply: Karnataka (29)`, 200, 55, { align: 'right' });
+    doc.text(`Payment Mode: ${order.paymentMode}`, 200, 61, { align: 'right' });
+    doc.text(`Payment ID: ${order.paymentId || 'N/A'}`, 200, 67, { align: 'right' });
+
+    // ======= Billing & Shipping Details =======
+    doc.setFont('helvetica', 'bold');
+    doc.text('Bill To:', 20, 78);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${order.userName}`, 20, 84);
+    doc.text(`Phone: ${order.userPhone}`, 20, 90);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Ship To:', 200, 78, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${order.shippingAddress?.house}, ${order.shippingAddress?.area}`, 200, 84, { align: 'right' });
+    doc.text(`${order.shippingAddress?.landmark || ''}`, 200, 90, { align: 'right' });
+
+    // ======= Table Body =======
+    const tableBody = order.items.map((item, index) => {
+      const basePrice = parseFloat(item.price) || 0;
+      const quantity = parseInt(item.quantity) || 0;
+      const gstRate = parseFloat(item?.gst) || 0;
+
+      const hasOffer =
+        item.offer &&
+        item.offer.offerpercentage &&
+        (!item.offer.validTill || new Date(item.offer.validTill) > new Date());
+
+      const offerRate = hasOffer ? item.offer.offerpercentage : 0;
+      const offerValidTill = hasOffer && item.offer.validTill
+        ? new Date(item.offer.validTill).toLocaleDateString()
+        : '—';
+
+      const discountedPrice = hasOffer
+        ? basePrice - (basePrice * offerRate) / 100
+        : basePrice;
+
+      const itemTotal = discountedPrice * quantity;
+      const gstAmount = (itemTotal * gstRate) / 100;
+      const finalTotal = itemTotal + gstAmount;
+
+      return [
+        index + 1,
+        item.name,
+        `${basePrice.toFixed(2)}`,
+        `${gstRate}%`,
+        offerRate ? `${offerRate}%` : '—',
+        offerValidTill,
+        quantity,
+        `${item.weight} ${item.unit}`,
+        `${finalTotal.toFixed(2)}`
+      ];
+    });
+
+    // ======= Product Table =======
+    autoTable(doc, {
+      startY: 105,
+      head: [[
+        'S.No', 'Product Name', 'Price', 'GST', 'Offer', 'Valid Till',
+        'Qty', 'Weight', 'Total'
+      ]],
+      body: tableBody,
+      styles: {
+        fontSize: 9,
+        cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+        overflow: 'linebreak',
+        halign: 'center', // <-- Center align everything by default
+        valign: 'middle',
+      },
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 8 },  // S.No
+        1: { cellWidth: 50, halign: 'left' }, // Product Name
+        2: { cellWidth: 25 },  // Price
+        3: { cellWidth: 12 },  // GST
+        4: { cellWidth: 12 },  // Offer
+        5: { cellWidth: 22 },  // Valid Till
+        6: { cellWidth: 9 },  // Qty
+        7: { cellWidth: 20 },  // Weight
+        8: { cellWidth: 25 },  // Total
+      },
+      theme: 'grid',
+      tableWidth: 'auto', // Adjust to page width
+    });
+
+
+    // ======= Total Summary =======
+    const finalY = doc.lastAutoTable.finalY + 8;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Grand Total: ${order.total.toFixed(2)}`, 150, finalY, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Thank you for shopping with us!', 20, finalY + 10);
+    doc.text('_________________________', 190, finalY + 18, { align: 'right' });
+    doc.text('Authorized Signatory', 190, finalY + 24, { align: 'right' });
+
+    // ======= Save File =======
+    doc.save(`Invoice_${order._id || order.id}.pdf`);
   };
 
   return (
@@ -117,6 +250,11 @@ const ProfileDrawer = ({
                                     {item.name} x{item.quantity} - ₹{item.price * item.quantity}
                                   </Typography>
                                 ))}
+                              </Box>
+                              <Box sx={{ mt: 2 }}>
+                                <Button variant="outlined" color="secondary" size="small" onClick={() => generateInvoice(order)}>
+                                  Download Invoice
+                                </Button>
                               </Box>
                             </Box>
                           ))
@@ -228,3 +366,4 @@ const ProfileDrawer = ({
 };
 
 export default ProfileDrawer;
+
