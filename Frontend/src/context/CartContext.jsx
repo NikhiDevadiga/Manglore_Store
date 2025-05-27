@@ -36,6 +36,19 @@ export const CartProvider = ({ children }) => {
     return unitToBase[unit] ? quantity * unitToBase[unit] : quantity;
   };
 
+  const calculateOfferPrice = (product) => {
+    const hasValidOffer =
+      product.offer &&
+      product.offer.offerpercentage > 0 &&
+      (!product.offer.validTill || new Date(product.offer.validTill) > new Date());
+
+    if (hasValidOffer) {
+      const discount = (product.price * product.offer.offerpercentage) / 100;
+      return product.price - discount;
+    }
+    return product.price;
+  };
+
   const addToCart = (product) => {
     const formattedImage = product.image?.includes("http")
       ? product.image
@@ -63,6 +76,8 @@ export const CartProvider = ({ children }) => {
       );
       toast.info('Quantity updated in cart', { toastId: `update-${product._id}` });
     } else {
+      const offerPrice = calculateOfferPrice(product);
+
       setCartItems((prev) => [
         ...prev,
         {
@@ -71,6 +86,7 @@ export const CartProvider = ({ children }) => {
           quantity: 1,
           stockquantity: product.stockquantity,
           stockunit: product.stockunit,
+          offerPrice: offerPrice, // Store calculated offer price
         },
       ]);
       toast.success('Added to cart', { toastId: `add-${product._id}` });
@@ -122,13 +138,11 @@ export const CartProvider = ({ children }) => {
         changeQuantity,
         removeFromCart,
         clearCart,
-        convertToBaseUnit, // Optional: if needed in UI to disable buttons
-        unitToBase,         // Optional: if needed in UI
+        convertToBaseUnit,
+        unitToBase,
       }}
     >
       {children}
     </CartContext.Provider>
   );
 };
-
-
