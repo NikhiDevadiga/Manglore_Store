@@ -33,25 +33,21 @@ export default function CartDrawer({ open, onClose }) {
 
   const finalTotal = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-        const price = parseFloat(item?.price) || 0;
-        const quantity = parseInt(item?.quantity) || 0;
-        const gst = parseFloat(item?.gst) || 0;
-        const itemTotal = price * quantity;
-        const gstAmount = (itemTotal * gst) / 100;
-        return sum + itemTotal + gstAmount;
-      }, 0)
+      const price = parseFloat(item?.offerPrice ?? item?.price) || 0;
+      const quantity = parseInt(item?.quantity) || 0;
+      return sum + price * quantity;
+    }, 0)
     : 0;
 
-  // Calculate total GST amount
   const totalGST = Array.isArray(cartItems)
     ? cartItems.reduce((sum, item) => {
-        const price = parseFloat(item?.price) || 0;
-        const quantity = parseInt(item?.quantity) || 0;
-        const gst = parseFloat(item?.gst) || 0;
-        const itemTotal = price * quantity;
-        const gstAmount = (itemTotal * gst) / 100;
-        return sum + gstAmount;
-      }, 0)
+      const price = parseFloat(item?.offerPrice ?? item?.price) || 0;
+      const quantity = parseInt(item?.quantity) || 0;
+      const gst = parseFloat(item?.gst) || 0;
+      const itemTotal = price * quantity;
+      const gstAmount = (itemTotal * gst) / 100;
+      return sum + gstAmount;
+    }, 0)
     : 0;
 
   const [paymentOpen, setPaymentOpen] = useState(false);
