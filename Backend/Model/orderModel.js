@@ -43,7 +43,12 @@ const orderSchema = new mongoose.Schema(
         price: { type: Number, required: true },
         weight: { type: Number, required: true },
         unit:{type: String, enum: ['Kg', 'Gm', 'Liter', 'Ml', 'Unit'], required: true},
-        quantity:{ type:Number, required:true}
+        quantity:{ type:Number, required:true},
+        gst: {type: Number,default: null },
+        offer: {
+          offerpercentage: { type: Number, default: null },
+          validTill: { type: Date, default: null }
+        },
       }
     ]
   },
