@@ -55,6 +55,7 @@ export const CartProvider = ({ children }) => {
       : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
 
     const exists = cartItems.find((item) => item._id === product._id);
+    const offerPrice = calculateOfferPrice(product);
 
     if (exists) {
       const stockBase = convertToBaseUnit(exists.stockquantity, exists.stockunit);
@@ -76,8 +77,6 @@ export const CartProvider = ({ children }) => {
       );
       toast.info('Quantity updated in cart', { toastId: `update-${product._id}` });
     } else {
-      const offerPrice = calculateOfferPrice(product);
-
       setCartItems((prev) => [
         ...prev,
         {
@@ -87,6 +86,8 @@ export const CartProvider = ({ children }) => {
           stockquantity: product.stockquantity,
           stockunit: product.stockunit,
           offerPrice: offerPrice, // Store calculated offer price
+          gst: product.gst || 0,
+          offer: product.offer || { offerpercentage: null, validTill: null },
         },
       ]);
       toast.success('Added to cart', { toastId: `add-${product._id}` });
