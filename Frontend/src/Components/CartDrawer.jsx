@@ -39,16 +39,12 @@ export default function CartDrawer({ open, onClose }) {
     }, 0)
     : 0;
 
-  const totalGST = Array.isArray(cartItems)
-    ? cartItems.reduce((sum, item) => {
-      const price = parseFloat(item?.offerPrice ?? item?.price) || 0;
-      const quantity = parseInt(item?.quantity) || 0;
-      const gst = parseFloat(item?.gst) || 0;
-      const itemTotal = price * quantity;
-      const gstAmount = (itemTotal * gst) / 100;
-      return sum + gstAmount;
-    }, 0)
-    : 0;
+  const totalGST = cartItems.reduce((sum, item) => {
+    const price = parseFloat(item?.offerPrice) || parseFloat(item?.price) || 0;
+    const quantity = parseInt(item?.quantity) || 0;
+    const gst = parseFloat(item?.gst) || 0;
+    return sum + ((price * quantity * gst) / 100);
+  }, 0);
 
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentMode, setPaymentMode] = useState('Cash on Delivery');
@@ -83,6 +79,8 @@ export default function CartDrawer({ open, onClose }) {
       );
     }
   }, []);
+
+
 
   const handleTogglePayment = () => setPaymentOpen(prev => !prev);
   const handleToggleAddresses = () => setAddressesOpen(prev => !prev);
@@ -184,6 +182,7 @@ export default function CartDrawer({ open, onClose }) {
       const order = {
         items: cartItems,
         total: finalTotal,
+        totalGST,
         paymentMode,
         address,
         location,
@@ -207,9 +206,8 @@ export default function CartDrawer({ open, onClose }) {
       return true;
     };
 
-
     if (paymentMode === 'Cash on Delivery') {
-      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal}`);
+      setDialogMessage(`Order placed successfully!\nPayment Mode: ${paymentMode}\nAmount: ₹${finalTotal+totalGST}`);
       setDialogOpen(true);
       await saveOrderToBackend();
       await saveAddressToBackend();
@@ -231,7 +229,7 @@ export default function CartDrawer({ open, onClose }) {
         image: 'https://your-logo-url.com/logo.png',
         handler: function (response) {
           saveOrderToBackend({ paymentId: response.razorpay_payment_id });
-          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal}`);
+          setDialogMessage(`Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}\nAmount: ₹${finalTotal+totalGST}`);
           setDialogOpen(true);
           saveAddressToBackend();
           clearCart();
@@ -256,6 +254,7 @@ export default function CartDrawer({ open, onClose }) {
     }
     return Math.round(price);
   };
+
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -315,6 +314,7 @@ export default function CartDrawer({ open, onClose }) {
                       Remove
                     </Button>
                   </Box>
+
                 </ListItem>
               ))}
             </List>
