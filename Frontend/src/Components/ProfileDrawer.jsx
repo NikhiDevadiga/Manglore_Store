@@ -54,6 +54,21 @@ const ProfileDrawer = ({
     }
   };
 
+  const calculateOrderGST = (order) => {
+    return order.items.reduce((acc, item) => {
+      const itemTotal = item.price * item.quantity;
+      const gstAmount = item.gst ? (itemTotal * parseFloat(item.gst) / 100) : 0;
+      return acc + gstAmount;
+    }, 0);
+  };
+
+  const generateInvoiceNumber = (order) => {
+    const date = new Date(order.createdAt);
+    const timestamp = date.getTime();
+    const shortId = order._id.slice(-5).toUpperCase(); // last 5 chars
+    return `INV-${timestamp}-${shortId}`;
+  };
+
   const generateInvoice = (order) => {
     const doc = new jsPDF();
 
@@ -71,11 +86,12 @@ const ProfileDrawer = ({
     doc.setFont('helvetica', 'bold');
     doc.text('TAX INVOICE / BILL OF SUPPLY', 105, 45, { align: 'center' });
 
+    const invoiceNumber = generateInvoiceNumber(order);
     // ======= Invoice Details =======
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Invoice No: ${order._id || order.id}`, 20, 55);
-    doc.text(`Order No: ${order._id || order.id}`, 20, 61);
+    doc.text(`Invoice No: ${invoiceNumber}`, 20, 55);
+    doc.text(`Order No: ${order._id}`, 20, 61);
     doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 20, 67);
 
     doc.text(`Place of Supply: Karnataka (29)`, 200, 55, { align: 'right' });
@@ -95,16 +111,24 @@ const ProfileDrawer = ({
     doc.text(`${order.shippingAddress?.house}, ${order.shippingAddress?.area}`, 200, 84, { align: 'right' });
     doc.text(`${order.shippingAddress?.landmark || ''}`, 200, 90, { align: 'right' });
 
+    let totalGSTAmount = 0; // Initialize outside map
     // ======= Table Body =======
     const tableBody = order.items.map((item, index) => {
       const basePrice = parseFloat(item.price) || 0;
       const quantity = parseInt(item.quantity) || 0;
       const gstRate = parseFloat(item?.gst) || 0;
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+      const validTillDate = item.offer?.validTill ? new Date(item.offer.validTill) : null;
+      validTillDate?.setHours(23, 59, 59, 999); // Include entire day
+
       const hasOffer =
         item.offer &&
         item.offer.offerpercentage &&
-        (!item.offer.validTill || new Date(item.offer.validTill) > new Date());
+        (!validTillDate || validTillDate >= today);
+
 
       const offerRate = hasOffer ? item.offer.offerpercentage : 0;
       const offerValidTill = hasOffer && item.offer.validTill
@@ -117,6 +141,7 @@ const ProfileDrawer = ({
 
       const itemTotal = discountedPrice * quantity;
       const gstAmount = (itemTotal * gstRate) / 100;
+      totalGSTAmount += gstAmount; // Accumulate total GST
       const finalTotal = itemTotal + gstAmount;
 
       return [
@@ -124,6 +149,7 @@ const ProfileDrawer = ({
         item.name,
         `${basePrice.toFixed(2)}`,
         `${gstRate}%`,
+        `${gstAmount.toFixed(2)}`,
         offerRate ? `${offerRate}%` : '—',
         offerValidTill,
         quantity,
@@ -136,15 +162,15 @@ const ProfileDrawer = ({
     autoTable(doc, {
       startY: 105,
       head: [[
-        'S.No', 'Product Name', 'Price', 'GST', 'Offer', 'Valid Till',
+        'S.No', 'Product', 'Price', 'GST %', 'GST Amt', 'Offer %', 'Valid Till',
         'Qty', 'Weight', 'Total'
       ]],
       body: tableBody,
       styles: {
         fontSize: 9,
-        cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+        // cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
         overflow: 'linebreak',
-        halign: 'center', // <-- Center align everything by default
+        cellPadding: 3,
         valign: 'middle',
       },
       headStyles: {
@@ -153,15 +179,16 @@ const ProfileDrawer = ({
         halign: 'center',
       },
       columnStyles: {
-        0: { cellWidth: 8 },  // S.No
-        1: { cellWidth: 50, halign: 'left' }, // Product Name
-        2: { cellWidth: 25 },  // Price
-        3: { cellWidth: 12 },  // GST
-        4: { cellWidth: 12 },  // Offer
-        5: { cellWidth: 22 },  // Valid Till
-        6: { cellWidth: 9 },  // Qty
-        7: { cellWidth: 20 },  // Weight
-        8: { cellWidth: 25 },  // Total
+        0: { cellWidth: 10, halign: 'center' },   // S.No
+        1: { cellWidth: 40, halign: 'left' }, // Product Name
+        2: { cellWidth: 18, halign: 'center' },   // Price
+        3: { cellWidth: 14, halign: 'center' },   // GST %
+        4: { cellWidth: 16, halign: 'center' },   // GST Amt
+        5: { cellWidth: 16, halign: 'center' },   // Offer %
+        6: { cellWidth: 23, halign: 'center' },   // Offer Till
+        7: { cellWidth: 11, halign: 'center' },   // Qty
+        8: { cellWidth: 18, halign: 'center' },   // Weight
+        9: { cellWidth: 18, halign: 'center' },   // Total
       },
       theme: 'grid',
       tableWidth: 'auto', // Adjust to page width
@@ -173,13 +200,21 @@ const ProfileDrawer = ({
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Grand Total: ${order.total.toFixed(2)}`, 150, finalY, { align: 'right' });
+    doc.text(`Total GST: ${totalGSTAmount.toFixed(2)}`, 195, finalY, { align: 'right' });
+    doc.text(`Grand Total: ${(order.total + calculateOrderGST(order)).toFixed(2)}`, 195, finalY + 8, { align: 'right' });
+
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.text('Thank you for shopping with us!', 20, finalY + 10);
-    doc.text('_________________________', 190, finalY + 18, { align: 'right' });
-    doc.text('Authorized Signatory', 190, finalY + 24, { align: 'right' });
+
+    // ↓↓↓ Add footer note ↓↓↓
+    const pageHeight = doc.internal.pageSize.height;
+    const footerText = "This is a computer generated invoice and does not require a physical signature";
+
+    doc.setFontSize(10);
+    doc.setTextColor(150); // medium gray for opacity effect
+    doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
 
     // ======= Save File =======
     doc.save(`Invoice_${order._id || order.id}.pdf`);
@@ -232,7 +267,7 @@ const ProfileDrawer = ({
                               <Typography variant="body1" fontWeight="bold" sx={{ color: '#9c78ce' }}>
                                 Order ID: {order._id}
                               </Typography>
-                              <Typography variant="body2">Total: ₹{order.total}</Typography>
+                              <Typography variant="body2">Total: ₹{(order.total + calculateOrderGST(order)).toFixed(2)}</Typography>
                               <Typography variant="body2">Payment Mode: {order.paymentMode}</Typography>
                               <Typography variant="body2">Payment ID: {order.paymentId}</Typography>
                               <Typography variant="body2">
