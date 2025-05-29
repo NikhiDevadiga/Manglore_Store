@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
@@ -50,6 +50,14 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product) => {
+    // Prevent adding product if stockquantity is 0 or falsy
+    if (!product.stockquantity || convertToBaseUnit(product.stockquantity, product.stockunit) <= 0) {
+      toast.error(`${product.name} is out of stock`, {
+        toastId: `out-of-stock-${product._id}`,
+      });
+      return;
+    }
+
     const formattedImage = product.image?.includes("http")
       ? product.image
       : `https://manglore-store-t98r.onrender.com/${product.image.replace(/\\/g, "/")}`;
@@ -75,7 +83,7 @@ export const CartProvider = ({ children }) => {
             : item
         )
       );
-      toast.info('Quantity updated in cart', { toastId: `update-${product._id}` });
+      toast('Quantity updated in cart', { id: `update-${product._id}` });
     } else {
       setCartItems((prev) => [
         ...prev,
@@ -99,7 +107,7 @@ export const CartProvider = ({ children }) => {
       prev.map((item) => {
         if (item._id === id) {
           if (newQty < 1) {
-            toast.warn('Removed from cart', { toastId: `remove-${id}` });
+            toast('Removed from cart', { id: `remove-${id}` });
             return null; // Remove item
           }
 
@@ -113,7 +121,7 @@ export const CartProvider = ({ children }) => {
             return item; // No change
           }
 
-          toast.info('Cart quantity changed', { toastId: `change-${id}` });
+          toast('Cart quantity changed', { id: `change-${id}` });
           return { ...item, quantity: newQty };
         }
         return item;
@@ -128,7 +136,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
-    toast.error('Cart cleared', { toastId: 'clear-cart' });
+    toast('Cart cleared', { id: 'clear-cart' });
   };
 
   return (
