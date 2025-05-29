@@ -22,27 +22,22 @@ const faqData = [
   {
     question: "Where do you deliver?",
     answer:
-      "We currently deliver across most areas in Mangalore city. Please enter your pincode at checkout to confirm delivery availability.",
-  },
-  {
-    question: "Is there a minimum order value for delivery?",
-    answer:
-      "Yes, a minimum order value of ₹200 is required for free delivery. Orders below ₹200 may have a small delivery charge.",
+      "We currently deliver across most areas in Mangalore city, ensuring wide coverage for your convenience.Whether you're in the heart of the city or in surrounding neighborhoods, our delivery network is designed to reach you promptly and reliably, bringing your essentials right to your doorstep.",
   },
   {
     question: "How can I pay for my order?",
     answer:
-      "We accept multiple payment methods including UPI, debit/credit cards, net banking, and Cash on Delivery (COD).",
+      "We accept multiple payment methods including UPI, net banking, and Cash on Delivery (COD).",
   },
   {
     question: "When will I receive my order?",
     answer:
-      "Orders placed before 6 PM are usually delivered the same day. Orders after 6 PM are delivered the next day.",
+      "Your order will typically be delivered within a few hours, ensuring you receive your items quickly and conveniently.Our delivery team works efficiently to get your products to your doorstep as soon as possible, minimizing wait times and providing a seamless shopping experience.",
   },
   {
     question: "Can I modify or cancel my order?",
     answer:
-      "Yes, you can cancel or modify your order before it is dispatched. Once it's out for delivery, changes may not be possible.",
+      "No, once the order is placed, it cannot be cancelled or modified.Please make sure to review your items carefully before placing your order.",
   },
   {
     question: "What if an item is missing or damaged?",
