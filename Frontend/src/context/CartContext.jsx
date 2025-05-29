@@ -14,14 +14,23 @@ export const CartProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  useEffect(() => {
-    const stored = localStorage.getItem(storageKey);
-    setCartItems(stored ? JSON.parse(stored) : []);
-  }, [storageKey]);
+  // useEffect(() => {
+  //   const stored = localStorage.getItem(storageKey);
+  //   setCartItems(stored ? JSON.parse(stored) : []);
+  // }, [storageKey]);
+
+  // useEffect(() => {
+  //   localStorage.setItem(storageKey, JSON.stringify(cartItems));
+  // }, [cartItems, storageKey]);
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(cartItems));
-  }, [cartItems, storageKey]);
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      setCartItems(JSON.parse(stored));
+    } else {
+      setCartItems([]);
+    }
+  }, [userId]); // ← this should depend only on userId, not storageKey
 
   // --- Unit conversion helpers ---
   const unitToBase = {
@@ -36,18 +45,42 @@ export const CartProvider = ({ children }) => {
     return unitToBase[unit] ? quantity * unitToBase[unit] : quantity;
   };
 
-  const calculateOfferPrice = (product) => {
-    const hasValidOffer =
-      product.offer &&
-      product.offer.offerpercentage > 0 &&
-      (!product.offer.validTill || new Date(product.offer.validTill) > new Date());
+  const isOfferValidTodayOrFuture = (validTill) => {
+    if (!validTill) return false;
+    const today = new Date();
+    const expiry = new Date(validTill);
 
-    if (hasValidOffer) {
-      const discount = (product.price * product.offer.offerpercentage) / 100;
-      return product.price - discount;
-    }
-    return product.price;
+    // Compare date only, ignore time
+    return expiry >= new Date(today.toDateString());
   };
+
+  const calculateOfferPrice = (product) => {
+    const { price, offer } = product;
+
+    if (
+      offer &&
+      offer.offerpercentage > 0 &&
+      isOfferValidTodayOrFuture(offer.validTill)
+    ) {
+      const discount = (price * offer.offerpercentage) / 100;
+      return parseFloat((price - discount).toFixed(2));
+    }
+
+    return price;
+  };
+
+  // const calculateOfferPrice = (product) => {
+  //   const hasValidOffer =
+  //     product.offer &&
+  //     product.offer.offerpercentage > 0 &&
+  //     (!product.offer.validTill || new Date(product.offer.validTill) > new Date());
+
+  //   if (hasValidOffer) {
+  //     const discount = (product.price * product.offer.offerpercentage) / 100;
+  //     return product.price - discount;
+  //   }
+  //   return product.price;
+  // };
 
   const addToCart = (product) => {
     // Prevent adding product if stockquantity is 0 or falsy
