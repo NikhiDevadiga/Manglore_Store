@@ -71,7 +71,6 @@ const Product = () => {
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    toast.success("Product added to Cart");
   };
 
   const calculateDiscountedPrice = (price, offer) => {
