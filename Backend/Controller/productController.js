@@ -38,17 +38,30 @@ export const getProducts = async (req, res) => {
     const { query } = req.query; // Extract query parameter from request
     let filter = {};
     if (query) {
-      // Ensure we're only searching by product name, not other fields
-      filter.name = { $regex: `^${query}`, $options: 'i' }; // Case-insensitive search for name
+      filter.name = { $regex: `^${query}`, $options: 'i' };
     }
-    // Find products using the filter (only by name if a query is present)
     const products = await Product.find(filter)
-      .populate('cat_id', 'name') // Populate category name
-      .populate('subcat_id', 'name') // Populate subcategory name
-      .select('name image price gst description cat_id subcat_id weight unit stockquantity stockunit offer'); // Select relevant fields
-    res.status(200).json({ success: true, data: products });
+      .populate('cat_id', 'name')
+      .populate('subcat_id', 'name')
+      .select('name image price gst description cat_id subcat_id weight unit stockquantity stockunit offer');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // Only modify products if offers exist and expire
+    const updatedProducts = products.map(product => {
+      if (product.offer && product.offer.validTill) {
+        const offerExpiryDate = new Date(product.offer.validTill);
+        offerExpiryDate.setHours(0, 0, 0, 0);
+        if (offerExpiryDate < today) {
+          const productObj = product.toObject(); // convert mongoose doc to plain JS object
+          delete productObj.offer; // remove expired offer
+          return productObj;
+        }
+      }
+      return product; // no changes if no expired offer
+    });
+    res.status(200).json({ success: true, data: updatedProducts });
   } catch (error) {
-    console.error("Error in fetching products:", error.message);  // Log the error message for debugging
+    console.error("Error in fetching products:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
