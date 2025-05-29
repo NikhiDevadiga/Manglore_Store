@@ -62,14 +62,13 @@ const ProfileDrawer = ({
     }, 0);
   };
 
-  const generateInvoiceNumber = (order) => {
-    const date = new Date(order.createdAt);
-    const timestamp = date.getTime();
+  const generateInvoiceNumber = (order, index = 0) => {
+    const paddedIndex = String(index + 1).padStart(5, '0'); // 1 → "00001"
     const shortId = order._id.slice(-5).toUpperCase(); // last 5 chars
-    return `INV-${timestamp}-${shortId}`;
+    return `INV-${paddedIndex}-${shortId}`;
   };
 
-  const generateInvoice = (order) => {
+  const generateInvoice = (order,index) => {
     const doc = new jsPDF();
 
     // ======= Store Header =======
@@ -86,7 +85,7 @@ const ProfileDrawer = ({
     doc.setFont('helvetica', 'bold');
     doc.text('TAX INVOICE / BILL OF SUPPLY', 105, 45, { align: 'center' });
 
-    const invoiceNumber = generateInvoiceNumber(order);
+    const invoiceNumber = generateInvoiceNumber(order,index);
     // ======= Invoice Details =======
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
@@ -287,7 +286,7 @@ const ProfileDrawer = ({
                                 ))}
                               </Box>
                               <Box sx={{ mt: 2 }}>
-                                <Button variant="outlined" color="secondary" size="small" onClick={() => generateInvoice(order)}>
+                                <Button variant="outlined" color="secondary" size="small" onClick={() => generateInvoice(order, index)}>
                                   Download Invoice
                                 </Button>
                               </Box>
@@ -401,4 +400,3 @@ const ProfileDrawer = ({
 };
 
 export default ProfileDrawer;
-
