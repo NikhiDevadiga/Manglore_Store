@@ -18,12 +18,11 @@ export const createProduct = async (req, res) => {
           unit: req.body.unit, // New field for unit of measurement
           stockquantity: req.body.stockquantity,
           stockunit:req.body.stockunit,
-           offer: {
-            offerpercentage: req.body.offerpercentage,
-            validTill: req.body.validTill || null
-          }
-          
-        });
+          offer: {
+               offerpercentage: req.body.offerpercentage,
+               validTill: req.body.validTill ? new Date(req.body.validTill) : null
+            }
+          });
         await products.save();
         res.status(201).json({success:true, data:products });
         
@@ -122,6 +121,7 @@ export const updateProduct = async (req, res) => {
       res.status(500).json({ success: false, message: "Server Error" });
     }
   };
+
 
 export const deleteProduct = async (req, res) => {
   const { id } = req.params;
