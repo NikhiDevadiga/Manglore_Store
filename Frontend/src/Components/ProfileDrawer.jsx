@@ -64,30 +64,33 @@ const ProfileDrawer = ({
 
   const numberToWords = (num) => {
     const a = [
-      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-      'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
+      'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen',
+      'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen',
+      'Nineteen'
     ];
-    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-    const inWords = (num) => {
-      if ((num = num.toString()).length > 9) return 'Overflow';
-      const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{3})$/);
-      if (!n) return; let str = '';
-      str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
-      str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Lakh ' : '';
-      str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Thousand ' : '';
-      str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' ' : '';
-      return str.trim();
+    const b = [
+      '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
+      'Sixty', 'Seventy', 'Eighty', 'Ninety'
+    ];
+  
+    const numberToWordsInternal = (n) => {
+      if (n < 20) return a[n];
+      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' ' + a[n % 10] : '');
+      if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' and ' + numberToWordsInternal(n % 100) : '');
+      if (n < 100000) return numberToWordsInternal(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + numberToWordsInternal(n % 1000) : '');
+      if (n < 10000000) return numberToWordsInternal(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 ? ' ' + numberToWordsInternal(n % 100000) : '');
+      return numberToWordsInternal(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + numberToWordsInternal(n % 10000000) : '');
     };
-
-    const [whole, decimal] = num.toFixed(2).split('.');
-    let words = inWords(parseInt(whole));
-    if (decimal && parseInt(decimal) > 0) {
-      words += ` and ${inWords(parseInt(decimal))} Paise`;
+  
+    const whole = Math.floor(num);
+    const fraction = Math.round((num - whole) * 100);
+    let result = `${numberToWordsInternal(whole)} Rupees`;
+    if (fraction > 0) {
+      result += ` and ${numberToWordsInternal(fraction)} Paise`;
     }
-    return `${words} Rupees Only`;
+    return result + ' Only';
   };
-
 
   const generateInvoiceNumber = (order, index = 0) => {
     const paddedIndex = String(index + 1).padStart(5, '0'); // 1 → "00001"
@@ -223,14 +226,16 @@ const ProfileDrawer = ({
 
     // ======= Total Summary =======
     const finalY = doc.lastAutoTable.finalY + 8;
+    const totalAmount = order.total + calculateOrderGST(order);
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text(`Total GST: ${totalGSTAmount.toFixed(2)}`, 195, finalY, { align: 'right' });
-    doc.text(`Grand Total: ${(order.total + calculateOrderGST(order)).toFixed(2)}`, 195, finalY + 8, { align: 'right' });
-    const totalInWords = numberToWords(grandTotal);
-    doc.setFont('helvetica', 'bold');
+    doc.text(`Grand Total: ${totalAmount.toFixed(2)}`, 195, finalY + 8, { align: 'right' });
+  
     doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const totalInWords = numberToWords(totalAmount);
     doc.text(`Amount in Words: ${totalInWords}`, 20, finalY + 18);
 
     doc.setFont('helvetica', 'normal');
