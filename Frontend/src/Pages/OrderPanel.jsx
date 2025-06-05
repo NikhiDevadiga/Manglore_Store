@@ -147,62 +147,72 @@ export default function OrdersPanel() {
           <b>Number of Sales:</b> {processedOrders.length}
         </Typography>
       </Box>
-
-
       {processedOrders.length === 0 ? (
         <Typography>No orders to display.</Typography>
       ) : (
-        processedOrders.map(order => (
-          <Paper key={order._id || order.id} sx={{ p: 2, mb: 2 }}>
-            <Typography variant="subtitle1"><b>Order ID:</b> {order._id || order.id}</Typography>
-            <Typography variant="body2"><b>Customer: </b>{order.userName}</Typography>
-            <Typography variant="body2"><b>Phone: </b>{order.userPhone}</Typography>
-            <Typography variant="body2"><b>Payment Mode: </b>{order.paymentMode}</Typography>
-            <Typography variant="body2"><b>Payment ID: </b>{order.paymentId}</Typography>
-            <Typography variant="body2">
-              <b>GST Total: </b> ₹{
-                order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0).toFixed(2)
-              }
-            </Typography>
+        processedOrders.map(order => {
+          const gstTotal = order.items.reduce(
+            (sum, item) => sum + parseFloat((item.gst || 0) * item.quantity),
+            0
+          );
+          const totalWithGST = order.total + gstTotal;
 
-            <Typography variant="body2">
-              <b>Total (incl. GST): </b> ₹{
-                (order.total +
-                  order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0)
-                ).toFixed(2)
-              }
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Date: {new Date(order.createdAt).toLocaleString()}
-            </Typography>
+          return (
+            <Paper key={order._id || order.id} sx={{ p: 2, mb: 2 }}>
+              <Typography variant="subtitle1"><b>Order ID:</b> {order._id || order.id}</Typography>
+              <Typography variant="body2"><b>Customer:</b> {order.userName}</Typography>
+              <Typography variant="body2"><b>Phone:</b> {order.userPhone}</Typography>
+              <Typography variant="body2"><b>Payment Mode:</b> {order.paymentMode}</Typography>
+              <Typography variant="body2"><b>Payment ID:</b> {order.paymentId}</Typography>
 
-            <Divider sx={{ my: 1 }} />
-            <Typography variant="subtitle2"><b>Shipping Address:</b></Typography>
-            <Typography variant="body2">
-              {order.shippingAddress?.house}, {order.shippingAddress?.area},<br />
-              {order.shippingAddress?.landmark}
-            </Typography>
+              <Typography variant="body2">
+                <b>GST Total:</b> ₹{gstTotal.toFixed(2)}
+              </Typography>
 
-            <Divider sx={{ my: 1 }} />
-            <Typography variant="subtitle2"><b>Items</b></Typography>
-            <List dense>
-              {order.items.map(item => (
-                <ListItem key={item._id}>
-                  <ListItemText
-                    primary={`${item.name} (x${item.quantity})`}
-                    secondary={
-                      <>
-                        Price: ₹{item.price} × {item.quantity} = ₹{item.price * item.quantity}<br />
-                        GST: ₹{((item.gst || 0) * item.quantity).toFixed(2)}<br />
-                        Total with GST: ₹{(item.price * item.quantity + (item.gst || 0) * item.quantity).toFixed(2)}
-                      </>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        ))
+              <Typography variant="body2">
+                <b>Total (incl. GST):</b> ₹{totalWithGST.toFixed(2)}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Date: {new Date(order.createdAt).toLocaleString()}
+              </Typography>
+
+              <Divider sx={{ my: 1 }} />
+
+              <Typography variant="subtitle2"><b>Shipping Address:</b></Typography>
+              <Typography variant="body2">
+                {order.shippingAddress?.house}, {order.shippingAddress?.area},<br />
+                {order.shippingAddress?.landmark}
+              </Typography>
+
+              <Divider sx={{ my: 1 }} />
+
+              <Typography variant="subtitle2"><b>Items</b></Typography>
+              <List dense>
+                {order.items.map(item => {
+                  const itemTotal = item.price * item.quantity;
+                  const itemGstTotal = (item.gst || 0) * item.quantity;
+                  const itemWithGst = itemTotal + itemGstTotal;
+
+                  return (
+                    <ListItem key={item._id}>
+                      <ListItemText
+                        primary={`${item.name} (x${item.quantity})`}
+                        secondary={
+                          <>
+                            Price: ₹{item.price} × {item.quantity} = ₹{itemTotal.toFixed(2)}<br />
+                            GST: ₹{itemGstTotal.toFixed(2)}<br />
+                            Total with GST: ₹{itemWithGst.toFixed(2)}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Paper>
+          );
+        })
       )}
     </Box>
   );
