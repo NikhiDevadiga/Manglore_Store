@@ -161,7 +161,7 @@ export default function OrdersPanel() {
             <Typography variant="body2"><b>Payment ID: </b>{order.paymentId}</Typography>
             <Typography variant="body2">
               <b>GST Total: </b> ₹{
-                order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0)
+                order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0).toFixed(2)
               }
             </Typography>
 
@@ -193,7 +193,7 @@ export default function OrdersPanel() {
                     secondary={
                       <>
                         Price: ₹{item.price} × {item.quantity} = ₹{item.price * item.quantity}<br />
-                        GST: ₹{((item.gst || 0) * item.quantity)}<br />
+                        GST: ₹{((item.gst || 0) * item.quantity).toFixed(2)}<br />
                         Total with GST: ₹{(item.price * item.quantity + (item.gst || 0) * item.quantity).toFixed(2)}
                       </>
                     }
