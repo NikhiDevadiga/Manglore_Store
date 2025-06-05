@@ -62,13 +62,40 @@ const ProfileDrawer = ({
     }, 0);
   };
 
+  const numberToWords = (num) => {
+    const a = [
+      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+      'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+    ];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    const inWords = (num) => {
+      if ((num = num.toString()).length > 9) return 'Overflow';
+      const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{3})$/);
+      if (!n) return; let str = '';
+      str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
+      str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Lakh ' : '';
+      str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Thousand ' : '';
+      str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' ' : '';
+      return str.trim();
+    };
+
+    const [whole, decimal] = num.toFixed(2).split('.');
+    let words = inWords(parseInt(whole));
+    if (decimal && parseInt(decimal) > 0) {
+      words += ` and ${inWords(parseInt(decimal))} Paise`;
+    }
+    return `${words} Rupees Only`;
+  };
+
+
   const generateInvoiceNumber = (order, index = 0) => {
     const paddedIndex = String(index + 1).padStart(5, '0'); // 1 → "00001"
     const shortId = order._id.slice(-5).toUpperCase(); // last 5 chars
     return `INV-${paddedIndex}-${shortId}`;
   };
 
-  const generateInvoice = (order,index) => {
+  const generateInvoice = (order, index) => {
     const doc = new jsPDF();
 
     // ======= Store Header =======
@@ -85,7 +112,7 @@ const ProfileDrawer = ({
     doc.setFont('helvetica', 'bold');
     doc.text('TAX INVOICE / BILL OF SUPPLY', 105, 45, { align: 'center' });
 
-    const invoiceNumber = generateInvoiceNumber(order,index);
+    const invoiceNumber = generateInvoiceNumber(order, index);
     // ======= Invoice Details =======
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
@@ -201,11 +228,14 @@ const ProfileDrawer = ({
     doc.setFont('helvetica', 'bold');
     doc.text(`Total GST: ${totalGSTAmount.toFixed(2)}`, 195, finalY, { align: 'right' });
     doc.text(`Grand Total: ${(order.total + calculateOrderGST(order)).toFixed(2)}`, 195, finalY + 8, { align: 'right' });
-
+    const totalInWords = numberToWords(grandTotal);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(`Amount in Words: ${totalInWords}`, 20, finalY + 18);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text('Thank you for shopping with us!', 20, finalY + 10);
+    doc.text('Thank you for shopping with us!', 20, finalY + 26);
 
     // ↓↓↓ Add footer note ↓↓↓
     const pageHeight = doc.internal.pageSize.height;
