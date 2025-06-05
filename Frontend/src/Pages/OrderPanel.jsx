@@ -147,15 +147,15 @@ export default function OrdersPanel() {
           <b>Number of Sales:</b> {processedOrders.length}
         </Typography>
       </Box>
+
       {processedOrders.length === 0 ? (
         <Typography>No orders to display.</Typography>
       ) : (
         processedOrders.map(order => {
           const gstTotal = order.items.reduce(
-            (sum, item) => sum + parseFloat((item.gst || 0) * item.quantity),
+            (sum, item) => sum + ((item.price || 0) * item.quantity * (item.gst || 0)) / 100,
             0
           );
-          const totalWithGST = order.total + gstTotal;
 
           return (
             <Paper key={order._id || order.id} sx={{ p: 2, mb: 2 }}>
@@ -164,14 +164,8 @@ export default function OrdersPanel() {
               <Typography variant="body2"><b>Phone:</b> {order.userPhone}</Typography>
               <Typography variant="body2"><b>Payment Mode:</b> {order.paymentMode}</Typography>
               <Typography variant="body2"><b>Payment ID:</b> {order.paymentId}</Typography>
-
-              <Typography variant="body2">
-                <b>GST Total:</b> ₹{gstTotal.toFixed(2)}
-              </Typography>
-
-              <Typography variant="body2">
-                <b>Total (incl. GST):</b> ₹{totalWithGST.toFixed(2)}
-              </Typography>
+              <Typography variant="body2"><b>GST Total:</b> ₹{gstTotal.toFixed(2)}</Typography>
+              <Typography variant="body2"><b>Total (incl. GST): </b> ₹{(order.total + gstTotal).toFixed(2)}</Typography>
 
               <Typography variant="body2" color="text.secondary">
                 Date: {new Date(order.createdAt).toLocaleString()}
@@ -191,8 +185,7 @@ export default function OrdersPanel() {
               <List dense>
                 {order.items.map(item => {
                   const itemTotal = item.price * item.quantity;
-                  const itemGstTotal = (item.gst || 0) * item.quantity;
-                  const itemWithGst = itemTotal + itemGstTotal;
+                  const gstAmount = (itemTotal * (item.gst || 0)) / 100;
 
                   return (
                     <ListItem key={item._id}>
@@ -201,8 +194,8 @@ export default function OrdersPanel() {
                         secondary={
                           <>
                             Price: ₹{item.price} × {item.quantity} = ₹{itemTotal.toFixed(2)}<br />
-                            GST: ₹{itemGstTotal.toFixed(2)}<br />
-                            Total with GST: ₹{itemWithGst.toFixed(2)}
+                            GST ({item.gst || 0}%): ₹{gstAmount.toFixed(2)}<br />
+                            Total with GST: ₹{(itemTotal + gstAmount).toFixed(2)}
                           </>
                         }
                       />
@@ -214,6 +207,7 @@ export default function OrdersPanel() {
           );
         })
       )}
+      
     </Box>
   );
 }
