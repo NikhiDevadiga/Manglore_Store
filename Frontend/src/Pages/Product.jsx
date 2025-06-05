@@ -35,11 +35,11 @@ const Product = () => {
       setLoading(true);
       try {
         if (isSingleProductPage && id) {
-          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/by-id/${id}`,{ headers: { 'Cache-Control': 'no-cache' } });
+          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/by-id/${id}`);
           const product = res.data?.data || res.data;
           setProducts(product && product._id ? [product] : []);
         } else if (subcategoryId) {
-          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`,{ headers: { 'Cache-Control': 'no-cache' } });
+          const res = await axios.get(`https://manglore-store-t98r.onrender.com/api/product/${subcategoryId}`);
           const data = res.data.data;
           setProducts(Array.isArray(data) ? data : [data]);
         }
