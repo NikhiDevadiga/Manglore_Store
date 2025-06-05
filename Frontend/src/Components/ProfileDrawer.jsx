@@ -233,10 +233,10 @@ const ProfileDrawer = ({
     doc.text(`Total GST: ${totalGSTAmount.toFixed(2)}`, 195, finalY, { align: 'right' });
     doc.text(`Grand Total: ${totalAmount.toFixed(2)}`, 195, finalY + 8, { align: 'right' });
   
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     const totalInWords = numberToWords(totalAmount);
-    doc.text(`Amount in Words: ${totalInWords}`, 20, finalY + 18);
+    doc.text(`Amount in Words: ${totalInWords},`, 20, finalY + 18);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
