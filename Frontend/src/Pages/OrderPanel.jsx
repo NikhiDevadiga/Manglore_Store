@@ -159,7 +159,19 @@ export default function OrdersPanel() {
             <Typography variant="body2"><b>Phone: </b>{order.userPhone}</Typography>
             <Typography variant="body2"><b>Payment Mode: </b>{order.paymentMode}</Typography>
             <Typography variant="body2"><b>Payment ID: </b>{order.paymentId}</Typography>
-            <Typography variant="body2"><b>Total: </b>₹{order.total}</Typography>
+            <Typography variant="body2">
+              <b>GST Total: </b> ₹{
+                order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0).toFixed(2)
+              }
+            </Typography>
+
+            <Typography variant="body2">
+              <b>Total (incl. GST): </b> ₹{
+                (order.total +
+                  order.items.reduce((sum, item) => sum + ((item.gst || 0) * item.quantity), 0)
+                ).toFixed(2)
+              }
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               Date: {new Date(order.createdAt).toLocaleString()}
             </Typography>
@@ -178,7 +190,13 @@ export default function OrdersPanel() {
                 <ListItem key={item._id}>
                   <ListItemText
                     primary={`${item.name} (x${item.quantity})`}
-                    secondary={`₹${item.price * item.quantity}`}
+                    secondary={
+                      <>
+                        Price: ₹{item.price} × {item.quantity} = ₹{item.price * item.quantity}<br />
+                        GST: ₹{((item.gst || 0) * item.quantity).toFixed(2)}<br />
+                        Total with GST: ₹{(item.price * item.quantity + (item.gst || 0) * item.quantity).toFixed(2)}
+                      </>
+                    }
                   />
                 </ListItem>
               ))}
